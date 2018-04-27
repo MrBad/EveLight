@@ -11,9 +11,6 @@ class GLProgram
     GLProgram();
     ~GLProgram();
     bool Create(const string &shadersPath);
-    bool CompileShader(const string &shaderCode, GLuint shaderID, const string &name);
-    bool CompileShaders(const string &shadersPath);
-    bool LinkShaders();
     void addAttribute(const string &name);
     GLint getAttribute(const string &name);
     void Use();
@@ -24,4 +21,7 @@ class GLProgram
     GLuint mVertexShader;
     GLuint mFragmentShader;
     GLuint mNumAttributes;
+    bool CompileShader(const string &shaderCode, GLuint shaderID, const string &name);
+    bool CompileShaders(const string &shadersPath);
+    bool LinkShaders();
 };

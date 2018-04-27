@@ -10,7 +10,6 @@ class Window
 {
   public:
     Window();
-    Window(const string &title, int width, int height);
     ~Window();
     bool Init();
     void setClearColor(float r, float g, float b, float a);

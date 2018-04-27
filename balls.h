@@ -5,6 +5,7 @@
 #include "game.h"
 #include "entity.h"
 #include "gl_program.h"
+#include "square.h"
 
 class Balls : public Game
 {
@@ -18,8 +19,7 @@ class Balls : public Game
     private:
         Entity mPlayer;
         GLProgram mProgram;
-        GLuint mVertexArray;
-        GLuint mVertexBuffer;
+        Square mSquares[3];
 };
 
 #endif

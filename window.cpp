@@ -4,21 +4,13 @@
 
 Window::Window()
 {
-    mWidth = 400;
-    mHeight = 300;
-    mTitle = "SDL Window";
-}
-
-Window::Window(const string &title, int width, int height)
-{
-    mWidth = width;
-    mHeight = height;
-    mTitle = title;
+    mWidth = 0;
+    mHeight = 0;
+    mTitle.clear();
 }
 
 bool Window::Init()
 {
-
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         cerr << "Cannot init SDL: " + string(SDL_GetError());
@@ -46,7 +38,7 @@ bool Window::Init()
     SetSwapInterval(0);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    setClearColor(0, 0, 0.2, 1);
+    setClearColor(0, 0, 0.3, 1);
     Clear();
 
     return true;

@@ -22,11 +22,10 @@ void Entity::setSize(float width, float height)
 SDL_Rect Entity::getRect()
 {
     SDL_Rect rect;
-    rect.x = (int) mX;
-    rect.y = (int) mY;
-    rect.w = (int) mWidth;
-    rect.h = (int) mHeight;
+    rect.x = (int)mX;
+    rect.y = (int)mY;
+    rect.w = (int)mWidth;
+    rect.h = (int)mHeight;
 
     return rect;
 }
-

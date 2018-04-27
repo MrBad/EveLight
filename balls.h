@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include "game.h"
 #include "entity.h"
+#include "gl_program.h"
 
 class Balls : public Game
 {
@@ -16,7 +17,7 @@ class Balls : public Game
 
     private:
         Entity mPlayer;
-        GLuint mShaderProgram;
+        GLProgram mProgram;
         GLuint mVertexArray;
         GLuint mVertexBuffer;
 };

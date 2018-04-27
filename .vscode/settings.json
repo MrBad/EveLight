@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "iosfwd": "cpp",
+        "*.ipp": "cpp",
+        "slist": "cpp",
+        "system_error": "cpp"
     }
 }

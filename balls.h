@@ -5,22 +5,22 @@
 #include "game.h"
 #include "entity.h"
 #include "gl_program.h"
-#include "square.h"
+#include "rectangle.h"
+#include "mesh.h"
 
 class Balls : public Game
 {
-    public:
-        Balls(const string &title, int width, int height) : Game(title, width, height) {}
-        ~Balls() {}
-        bool onGameInit() override final;
-        bool onGameUpdate(uint32_t diffTicks) override final;
-        void onGameDelete() override final;
+  public:
+    Balls(const string &title, int width, int height) : Game(title, width, height) {}
+    ~Balls() {}
+    bool onGameInit() override final;
+    bool onGameUpdate(uint32_t diffTicks) override final;
+    void onGameDelete() override final;
 
-    private:
-        Entity mPlayer;
-        GLProgram mProgram;
-        Square mSquares[3];
+  private:
+    Entity mPlayer;
+    GLProgram mProgram;
+    vector<Rectangle*> mRects;
 };
 
 #endif
-

@@ -1,6 +1,7 @@
 core
 tags
 evelight
+.idea
 # Prerequisites
 *.d
 

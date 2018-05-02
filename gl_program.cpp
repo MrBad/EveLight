@@ -133,7 +133,17 @@ GLint GLProgram::getAttribute(const string &name)
 {
     return glGetAttribLocation(mProgram, name.c_str());
 }
-
+GLuint GLProgram::getUniformLocation(const std::string &uniformName)
+{
+    GLint location = glGetUniformLocation(mProgram, uniformName.c_str());
+    if ((unsigned)location == GL_INVALID_INDEX)
+    {
+        cerr << location;
+        cerr << "Uniform: " << uniformName << " not found in shader for program " << mProgram << endl;
+        return 0;
+    }
+    return location;
+}
 void GLProgram::Use()
 {
     glUseProgram(mProgram);

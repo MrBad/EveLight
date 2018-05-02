@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "vertex.h"
+#include "gl_program.h"
 
 using namespace std;
 
@@ -16,15 +17,18 @@ class Mesh
     void SetVertices(const vector<Vertex> &vertices);
     void SetIndexes(const vector<int> &indexes);
     void SetDrawType(GLenum drawType);
-    void Draw();
+    void SetProgramId(GLuint progrmId);
+    virtual void Draw();
   
   protected:
     bool mDirty;
     vector<Vertex> mVertices;
     vector<int> mIndexes;
     GLenum mDrawType;
+    GLuint mVertexArray, mVertexBuffer, mIndexBuffer;
+    GLuint mProgramId;
 
   private:
     void Update();
-    GLuint mVertexArray, mVertexBuffer, mIndexBuffer;
+    
 };

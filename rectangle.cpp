@@ -7,7 +7,7 @@ using namespace std;
 Rectangle::Rectangle(float x, float y, float width, float height)
 {
     mVertices.resize(4);
-    mIndexes = { LB, LT, LT, RT, RT, RB, RB, LB, LB, RT, RB, LT };
+    mIndexes = { LB, LT, LT, RT, RT, RB, RB, LB };
     mDrawType = GL_LINES;
     mX = x;
     mY = y;
@@ -45,6 +45,10 @@ void Rectangle::Update()
     mVertices[RB].SetPos(mX + mWidth, mY);
     for (uint i = 0; i < mVertices.size(); i++)
         mVertices[i].SetColor(mColor);
+    mVertices[LB].SetUV(0, 0);
+    mVertices[LT].SetUV(0, 1);
+    mVertices[RT].SetUV(1, 1);
+    mVertices[RB].SetUV(1, 0);
     mDirty = true;
 }
 

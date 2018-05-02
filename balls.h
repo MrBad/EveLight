@@ -7,6 +7,8 @@
 #include "gl_program.h"
 #include "rectangle.h"
 #include "mesh.h"
+#include "texture.h"
+#include "texture_manager.h"
 
 class Balls : public Game
 {
@@ -20,6 +22,7 @@ class Balls : public Game
   private:
     Entity mPlayer;
     GLProgram mProgram;
+    TextureManager mTexMgr;
     vector<Rectangle*> mRects;
 };
 

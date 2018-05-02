@@ -13,6 +13,8 @@ class GLProgram
     bool Create(const string &shadersPath);
     void addAttribute(const string &name);
     GLint getAttribute(const string &name);
+    GLuint getId() { return mProgram; }
+    GLuint getUniformLocation(const std::string& uniformName);
     void Use();
     void Unuse();
 

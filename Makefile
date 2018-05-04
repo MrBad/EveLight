@@ -1,12 +1,14 @@
 CC=gcc
 INCLUDE=
 DFLAGS=
-LIBS=-lstdc++ -lSDL2 -lGL -lGLEW
+LIBS=-lstdc++ -lSDL2 -lGL -lGLEW -lm
 OFLAGS=-c
 CFLAGS=-g3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
 
-OBJECTS=main.o window.o game.o input_manager.o timer.o balls.o entity.o gl_program.o mesh.o rectangle.o \
-		lodepng/lodepng.o texture.o texture_manager.o sprite.o
+OBJECTS=main.o window.o game.o input_manager.o timer.o camera.o entity.o gl_program.o mesh.o rectangle.o \
+		lodepng/lodepng.o texture.o texture_manager.o sprite.o \
+		balls.o
+
 TARGET=evelight
 
 all: $(OBJECTS) Makefile

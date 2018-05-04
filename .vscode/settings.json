@@ -34,6 +34,7 @@
         "new": "cpp",
         "ratio": "cpp",
         "stdexcept": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "iostream": "cpp"
     }
 }

@@ -3,6 +3,7 @@
 
 #include "window.h"
 #include "input_manager.h"
+#include "camera.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ class Game
     } mState;
     Window mWindow;
     InputManager mInMgr;
+    Camera mCamera;
     uint32_t mFPSTicks;
     uint32_t mFPSNumFrames;
     uint32_t mFPS;

@@ -1,11 +1,14 @@
 #include <iostream>
 #include "game.h"
 #include "timer.h"
+#include <glm/glm.hpp>
 
 Game::Game(const string &title, int width, int height)
 {
     mWindow.setTitle(title);
     mWindow.setSize(width, height);
+    mCamera = Camera(width, height, 1.0f, 1.001f);
+    mCamera.SetPos(width / 2, height / 2);
     mFPSNumFrames = 0;
     mFPS = 0;
     mFPSTicks = 0;

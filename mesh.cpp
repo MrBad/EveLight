@@ -38,7 +38,7 @@ void Mesh::SetProgramId(GLuint programId)
     mProgramId = programId;
 }
 
-void Mesh::AddVertex(const Vertex& vertex)
+void Mesh::AddVertex(const Vertex &vertex)
 {
     mVertices.push_back(vertex);
     mDirty = true;
@@ -52,8 +52,14 @@ void Mesh::AddIndex(const int index)
 
 void Mesh::Update()
 {
-    enum shader_attrs { POSITION, COLOR, UV, SHADER_NUM_ATTRS };
-        
+    enum shader_attrs
+    {
+        POSITION,
+        COLOR,
+        UV,
+        SHADER_NUM_ATTRS
+    };
+
     if (!mVertexArray)
     {
         glGenVertexArrays(1, &mVertexArray);
@@ -75,15 +81,15 @@ void Mesh::Update()
      * normalized, stride, pointer */
     glVertexAttribPointer(
         POSITION, sizeof(mVertices[0].pos) / sizeof(float), GL_FLOAT, GL_FALSE,
-        sizeof(mVertices[0]), (void *) offsetof(Vertex, pos));
+        sizeof(mVertices[0]), (void *)offsetof(Vertex, pos));
 
     glVertexAttribPointer(
         COLOR, sizeof(mVertices[0].color) / sizeof(uint8_t), GL_UNSIGNED_BYTE, GL_TRUE,
-        sizeof(mVertices[0]), (void *) offsetof(Vertex, color));
+        sizeof(mVertices[0]), (void *)offsetof(Vertex, color));
 
     glVertexAttribPointer(
-        UV, sizeof(mVertices[0].uv)/sizeof(float), GL_FLOAT, GL_FALSE,
-            sizeof(mVertices[0]), (void *) offsetof(Vertex, uv));
+        UV, sizeof(mVertices[0].uv) / sizeof(float), GL_FLOAT, GL_FALSE,
+        sizeof(mVertices[0]), (void *)offsetof(Vertex, uv));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -94,12 +100,10 @@ void Mesh::Update()
 
 void Mesh::Draw()
 {
-
     if (mDirty)
         Update();
 
     glBindVertexArray(mVertexArray);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
     glDrawElements(mDrawType, mIndexes.size(), GL_UNSIGNED_INT, nullptr);
-
 }

@@ -2,13 +2,13 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include "mesh.h"
+#include "renderable.h"
 
-class Rectangle : public Mesh
+class Rectangle : public Renderable
 {
   public:
-    Rectangle() {}
-    Rectangle(float x, float y, float width, float height);
+    Rectangle(){}
+    Rectangle(float x, float y, float width, float height, const Color &color);
     void SetPos(float x, float y);
     void SetColor(const Color &color);
     void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
@@ -17,12 +17,5 @@ class Rectangle : public Mesh
     enum { LB, LT, RT, RB };
     float mX, mY, mWidth, mHeight;
     Color mColor;
-    void Update();
-};
-
-
-class FilledRectangle : public Rectangle
-{
-  public:
-    FilledRectangle(float x, float y, float width, float height);
+    void BuildVertices();
 };

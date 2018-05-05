@@ -4,6 +4,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <vector>
+#include <random>
 #include "entity.h"
 #include "balls.h"
 #include "texture.h"
@@ -12,47 +13,43 @@
 bool Balls::onGameInit()
 {
     mProgram.Create("res/shaders/simple");
-
-    Texture *texture;
-    std::vector<uint8_t> imageBuf = {255, 0, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255};
-    texture = new Texture("default", 2, 2, imageBuf);
-    mTexMgr.Add("default", texture);
-    mTexMgr.Add("earth", "res/textures/earth.png");
-    mTexMgr.Add("wallpaper", "res/textures/wallpaper.png");
     mTexMgr.Add("circle", "res/textures/circle.png");
+    mTexMgr.Add("earth", "res/textures/earth.png");
 
-    Rectangle *rect = new Rectangle(10, 10, mWindow.getWidth() / 2, mWindow.getHeight() / 2);
-    rect->SetColor(Color(255, 0, 0, 255));
-    mRects.push_back(rect);
+    mCamera.SetPos(10 * mWindow.getWidth() / 2, 10 * mWindow.getHeight() / 2);
 
-    rect = new FilledRectangle(200, 200, 200, 200);
-    rect->SetColor(0, 128, 0, 128);
-    mRects.push_back(rect);
+    mRenderer.Init();
 
-    rect = new Sprite(500, 400, 200, 150, mTexMgr.Get("earth"), mProgram);
-    rect->SetColor(255, 255, 255, 255);
-    mRects.push_back(rect);
+    std::mt19937 rng(time(NULL));
+    std::uniform_int_distribution<int> gen(0, mWindow.getWidth() * 30);
 
-    rect = new Sprite(500, 100, 150, 150, mTexMgr.Get("default"), mProgram);
-    rect->SetColor(255, 255, 255, 200);
-    mRects.push_back(rect);
+    for (int i = 0; i < 300000; i++)
+    {
+        const Color color(gen(rng) % 255, gen(rng) % 255, gen(rng) % 255, 200);
+        FilledRectangle *obj = new FilledRectangle(gen(rng), gen(rng), 32, 32, color);
+        mRenderer.Add(obj);
+    }
+    for (int i = 0; i < 300000; i++)
+    {
+        const Color color(gen(rng) % 255, gen(rng) % 255, gen(rng) % 255, 200);
+        Rectangle *obj = new Rectangle(gen(rng), gen(rng), 32, 32, color);
+        mRenderer.Add(obj);
+    }
+    for (int i = 0; i < 300000; i++)
+    {
+        const Color color(gen(rng) % 255, gen(rng) % 255, gen(rng) % 255, 200);
+        uint textureId = i < 150000 ? mTexMgr.Get("circle")->getId() : mTexMgr.Get("earth")->getId();
+        Sprite *obj = new Sprite(gen(rng), gen(rng), 32, 32, color, textureId);
+        mRenderer.Add(obj);
+    }
 
-    rect = new Sprite(400, 500, 150, 150, mTexMgr.Get("circle"), mProgram);
-    rect->SetColor(100, 255, 100, 200);
-    mRects.push_back(rect);
-
-    rect = new FilledRectangle(450, 150, 200, 200);
-    rect->SetColor(0, 128, 128, 128);
-    mRects.push_back(rect);
     return true;
 }
 
-bool Balls::onGameUpdate(uint32_t ticks)
+void Balls::updateCamera(uint ticks)
 {
-    (void)ticks;
-    
     float speed = 0.3f * ticks;
-    float scaleSpeed = 1.0f + (float)ticks/1000;
+    float scaleSpeed = 1.0f + (float)ticks / 1000;
 
     if (mInMgr.isKeyPressed(K_q))
         mCamera.SetScale(mCamera.GetScale() * scaleSpeed);
@@ -68,11 +65,15 @@ bool Balls::onGameUpdate(uint32_t ticks)
         mCamera.SetPos(mCamera.GetX() + speed, mCamera.GetY());
     // send camera matrix to opengl //
     mCamera.SetMatrix(mProgram.getId(), "MVP");
+}
 
-    for (uint i = 0; i < mRects.size(); i++)
-        mRects[i]->Draw();
+bool Balls::onGameUpdate(uint32_t ticks)
+{
+    updateCamera(ticks);
 
-    //cout << mFPS << endl;
+    mRenderer.Draw();
+
+    cout << mFPS << endl;
 
     return true;
 }

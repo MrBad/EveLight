@@ -36,7 +36,7 @@ bool Window::Init()
         return false;
     }
     //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SetSwapInterval(1);
+    setSwapInterval(0);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     setClearColor(0, 0, 0.3, 1);
@@ -69,7 +69,7 @@ void Window::Clear()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool Window::SetSwapInterval(int interval)
+bool Window::setSwapInterval(int interval)
 {
     return SDL_GL_SetSwapInterval(interval) == 0;
 }

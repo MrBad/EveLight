@@ -9,6 +9,7 @@
 #include "mesh.h"
 #include "texture.h"
 #include "texture_manager.h"
+#include "renderer.h"
 
 class Balls : public Game
 {
@@ -20,10 +21,11 @@ class Balls : public Game
     void onGameDelete() override final;
 
   private:
+    void updateCamera(uint ticks);
     Entity mPlayer;
     GLProgram mProgram;
     TextureManager mTexMgr;
-    vector<Rectangle*> mRects;
+    Renderer mRenderer;
 };
 
 #endif

@@ -21,7 +21,7 @@
                 "panel": "shared"
             },
             "args": [
-                "QUIET=0"
+                "-j4"
             ],
             "problemMatcher": {
                 "owner": "vio",

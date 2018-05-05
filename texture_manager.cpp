@@ -2,9 +2,7 @@
 #include "lodepng/lodepng.h"
 
 TextureManager::TextureManager()
-{
-    cout << "Texture manager constructor called" << endl;
-   
+{  
 }
 
 Texture *TextureManager::Get(const std::string &name)
@@ -12,7 +10,7 @@ Texture *TextureManager::Get(const std::string &name)
     auto it = mTextures.find(name);
     if (it == mTextures.end())
     {
-        std::cerr << "Cannot find texture: " << name;
+        std::cerr << "Cannot find texture: " << name << std::endl;
         return nullptr;
     }
 
@@ -24,9 +22,10 @@ bool TextureManager::Add(const std::string &name, Texture *texture)
     auto ret = mTextures.insert(pair<string, Texture *>(name, texture));
     if (ret.second == false)
     {
-        cerr << "Texture " << name << " already added" << endl;
+        std::cerr << "Texture " << name << " already added" << std::endl;
         return false;
     }
+
     return true;
 }
 
@@ -47,12 +46,12 @@ Texture *TextureManager::Add(const std::string &genericName, const std::string &
         return texture;
 
     delete texture;
+
     return nullptr;
 }
 
 TextureManager::~TextureManager()
 {
-    cout << "Texture manager destructor called" << endl;
     for (auto i = mTextures.begin(); i != mTextures.end(); i++)
         delete i->second;
 }

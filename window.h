@@ -13,7 +13,7 @@ class Window
     ~Window();
     bool Init();
     void setClearColor(float r, float g, float b, float a);
-    bool SetSwapInterval(int interval);
+    bool setSwapInterval(int interval);
     void Clear();
     SDL_Window *getSDLWindow() { return mWindow; }
     int getWidth() { return mWidth; }

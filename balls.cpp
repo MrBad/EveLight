@@ -9,19 +9,26 @@
 #include <random>
 #include <vector>
 
-const int TSZ = 64;
+const int TSZ = 40;
+const int BSZ = 32;
+const int NUM_BALLS = 50;
 
 void Balls::buildMap()
 {
 
     std::string map = "####################\n"
                       "#                  #\n"
+                      "#   ####           #\n"
+                      "#   #              #\n"
+                      "#   ####           #\n"
+                      "#   #      ###     #\n"
+                      "#   ####           #\n"
                       "#                  #\n"
                       "#                  #\n"
                       "#                  #\n"
                       "#                  #\n"
-                      "#                  #\n"
-                      "#                  #\n"
+                      "#    ##            #\n"
+                      "#            ###   #\n"
                       "#                  #\n"
                       "####################\n";
 
@@ -48,7 +55,7 @@ void Balls::buildMap()
             y++;
             break;
         default:
-            std::cout << "unknown symbol: " << map[i] << " at " << x << ", " << y;
+            std::cout << "Unknown symbol: " << map[i] << " at " << x << ", " << y;
         }
     }
     mMapY = y;
@@ -68,14 +75,19 @@ bool Balls::onGameInit()
 
     std::mt19937 rng(time(NULL));
     std::uniform_int_distribution<int> gen(1, 255);
-    std::uniform_int_distribution<int> fgen(-1000, 1000);
+    std::normal_distribution<float> fgen(-1, 1);
 
-    for (int i = 0; i < 8000; i++) {
+    // Add balls to map //
+    for (int i = 0; i < NUM_BALLS; i++) {
         const Color color(gen(rng), gen(rng), gen(rng), 200);
+        float radius = BSZ / 2 + gen(rng) % BSZ / 2;
+
         Ball* ball = new Ball(
-            (1 + gen(rng) % (mMapX - 2)) * TSZ, (1 + gen(rng) % (mMapY - 2)) * TSZ,
-            32, 32, color, mTexMgr.Get("circle")->getId());
-        ball->SetVelocity(glm::vec2(0.0001f * fgen(rng), 0.0001f * fgen(rng)));
+            fgen(rng) + (1 + gen(rng) % (mMapX - 2)) * TSZ,
+            fgen(rng) + (1 + gen(rng) % (mMapY - 2)) * TSZ,
+            radius, radius, color, mTexMgr.Get("circle")->getId());
+
+        ball->SetVelocity(glm::vec2(0.05f * fgen(rng), 0.05f * fgen(rng)));
         mRenderer.Add(ball);
         mBalls.push_back(ball);
     }
@@ -110,14 +122,15 @@ bool Balls::onGameUpdate(uint32_t ticks)
     for (uint i = 0; i < mBalls.size(); i++) {
         mBalls[i]->Update(ticks);
         for (uint j = 0; j < mBricks.size(); j++) {
+            // Ball Brick collision
             Ball* ball = mBalls[i];
             Sprite* brick = mBricks[j];
             AABB ballAABB = ball->GetAABB();
             AABB brickAABB = brick->GetAABB();
             if (!(ballAABB.Intersects(brickAABB)))
                 continue;
+
             glm::vec2 v2Distance = ballAABB.GetDistance(brickAABB);
-            // std::cout << "distance: " << v2Distance.x << ", " << v2Distance.y << std::endl;
             float newX = ball->GetX(), newY = ball->GetY();
             if (fabsf(v2Distance.x) > fabsf(v2Distance.y)) {
                 if (v2Distance.x < 0) {
@@ -139,6 +152,42 @@ bool Balls::onGameUpdate(uint32_t ticks)
                 ball->SetVelocity(ball->GetVelocity() * glm::vec2(1, -1));
             }
             ball->SetPos(newX, newY);
+            assert(newX > 0 && newX < mMapX * TSZ);
+            assert(newY > 0 && newY < mMapY * TSZ);
+        }
+        // Ball - Ball collision
+        for (uint j = i + 1; j < mBalls.size(); j++) {
+            Ball* a = mBalls[i];
+            Ball* b = mBalls[j];
+            float minDist = a->GetRadius() + b->GetRadius();
+            const glm::vec2 v2Dist(
+                a->GetX() + a->GetRadius() - (b->GetX() + b->GetRadius()),
+                a->GetY() + a->GetRadius() - (b->GetY() + b->GetRadius()));
+            float dist = glm::length(v2Dist);
+            if (minDist < dist)
+                continue;
+            if (!dist) // XXX bad position, avoid 0
+                continue;
+
+            float depth = minDist - dist;
+            glm::vec2 v2ColDept = glm::normalize(v2Dist) * depth;
+            v2ColDept *= 0.5;
+            a->SetPos(a->GetX() + v2ColDept.x, a->GetY() + v2ColDept.y);
+            b->SetPos(b->GetX() - v2ColDept.x, b->GetY() - v2ColDept.y);
+
+            float arc = a->GetRadius() * a->GetRadius() * a->GetRadius();
+            float brc = b->GetRadius() * b->GetRadius() * b->GetRadius();
+            // v1New = (v1 * (vol1 - vol2) + 2 * vol2 * v2) / (vol1 + vol2) //
+            glm::vec2 aVNew = a->GetVelocity() * (arc - brc);
+            aVNew = aVNew + b->GetVelocity() * (2 * brc);
+            aVNew = aVNew / (arc + brc);
+
+            glm::vec2 bVNew = b->GetVelocity() * (brc - arc);
+            bVNew = bVNew + a->GetVelocity() * (2 * arc);
+            bVNew = bVNew / (arc + brc);
+
+            a->SetVelocity(aVNew);
+            b->SetVelocity(bVNew);
         }
     }
 

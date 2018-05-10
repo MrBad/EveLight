@@ -1,6 +1,6 @@
 // DOC: http://sunandblackcat.com/tipFullView.php?l=eng&topicid=18&topic=OpenGL-VAO-VBO-EBO
-#include <iostream>
 #include "mesh.h"
+#include <iostream>
 
 Mesh::Mesh()
 {
@@ -16,13 +16,13 @@ Mesh::~Mesh()
     glDeleteBuffers(1, &mIndexBuffer);
 }
 
-void Mesh::SetVertices(const vector<Vertex> &vertices)
+void Mesh::SetVertices(const vector<Vertex>& vertices)
 {
     mVertices = vertices;
     mDirty = true;
 }
 
-void Mesh::SetIndexes(const vector<int> &indexes)
+void Mesh::SetIndexes(const vector<int>& indexes)
 {
     mIndexes = indexes;
     mDirty = true;
@@ -38,7 +38,7 @@ void Mesh::SetProgramId(GLuint programId)
     mProgramId = programId;
 }
 
-void Mesh::AddVertex(const Vertex &vertex)
+void Mesh::AddVertex(const Vertex& vertex)
 {
     mVertices.push_back(vertex);
     mDirty = true;
@@ -52,16 +52,14 @@ void Mesh::AddIndex(const int index)
 
 void Mesh::Update()
 {
-    enum shader_attrs
-    {
+    enum shader_attrs {
         POSITION,
         COLOR,
         UV,
         SHADER_NUM_ATTRS
     };
 
-    if (!mVertexArray)
-    {
+    if (!mVertexArray) {
         glGenVertexArrays(1, &mVertexArray);
         glGenBuffers(1, &mVertexBuffer);
         glGenBuffers(1, &mIndexBuffer);
@@ -81,15 +79,15 @@ void Mesh::Update()
      * normalized, stride, pointer */
     glVertexAttribPointer(
         POSITION, sizeof(mVertices[0].pos) / sizeof(float), GL_FLOAT, GL_FALSE,
-        sizeof(mVertices[0]), (void *)offsetof(Vertex, pos));
+        sizeof(mVertices[0]), (void*)offsetof(Vertex, pos));
 
     glVertexAttribPointer(
         COLOR, sizeof(mVertices[0].color) / sizeof(uint8_t), GL_UNSIGNED_BYTE, GL_TRUE,
-        sizeof(mVertices[0]), (void *)offsetof(Vertex, color));
+        sizeof(mVertices[0]), (void*)offsetof(Vertex, color));
 
     glVertexAttribPointer(
         UV, sizeof(mVertices[0].uv) / sizeof(float), GL_FLOAT, GL_FALSE,
-        sizeof(mVertices[0]), (void *)offsetof(Vertex, uv));
+        sizeof(mVertices[0]), (void*)offsetof(Vertex, uv));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

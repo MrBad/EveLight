@@ -12,4 +12,3 @@ uint32_t Timer::Update(uint32_t ticks)
 
     return diffTicks;
 }
-

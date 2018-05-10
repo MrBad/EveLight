@@ -1,18 +1,14 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include <cstdint>
 
-class Timer
-{
-  public:
+class Timer {
+public:
     Timer(uint32_t currTicks);
     ~Timer() {}
     uint32_t Update(uint32_t currTicks);
 
-  private:
+private:
     uint32_t mPrevTicks;
     uint32_t mNumUpdates;
 };
-
-#endif

@@ -2,14 +2,13 @@
 #include "lodepng/lodepng.h"
 
 TextureManager::TextureManager()
-{  
+{
 }
 
-Texture *TextureManager::Get(const std::string &name)
+Texture* TextureManager::Get(const std::string& name)
 {
     auto it = mTextures.find(name);
-    if (it == mTextures.end())
-    {
+    if (it == mTextures.end()) {
         std::cerr << "Cannot find texture: " << name << std::endl;
         return nullptr;
     }
@@ -17,11 +16,10 @@ Texture *TextureManager::Get(const std::string &name)
     return it->second;
 }
 
-bool TextureManager::Add(const std::string &name, Texture *texture)
+bool TextureManager::Add(const std::string& name, Texture* texture)
 {
-    auto ret = mTextures.insert(pair<string, Texture *>(name, texture));
-    if (ret.second == false)
-    {
+    auto ret = mTextures.insert(pair<string, Texture*>(name, texture));
+    if (ret.second == false) {
         std::cerr << "Texture " << name << " already added" << std::endl;
         return false;
     }
@@ -29,20 +27,19 @@ bool TextureManager::Add(const std::string &name, Texture *texture)
     return true;
 }
 
-Texture *TextureManager::Add(const std::string &genericName, const std::string &path)
+Texture* TextureManager::Add(const std::string& genericName, const std::string& path)
 {
     uint width, height, err;
     std::vector<uint8_t> imageBuf;
     err = lodepng::decode(imageBuf, width, height, path);
-    if (err)
-    {
+    if (err) {
         std::cerr
             << "Cannot open " << path << ": (" << err << ")"
             << lodepng_error_text(err) << std::endl;
         return nullptr;
     }
-    Texture *texture = new Texture(path, width, height, imageBuf);
-    if (Add(genericName, texture)) 
+    Texture* texture = new Texture(path, width, height, imageBuf);
+    if (Add(genericName, texture))
         return texture;
 
     delete texture;

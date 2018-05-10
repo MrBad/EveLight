@@ -1,6 +1,7 @@
 core
 tags
 evelight
+.gdb_history
 .idea
 # Prerequisites
 *.d

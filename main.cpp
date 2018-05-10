@@ -1,5 +1,5 @@
-#include <iostream>
 #include "balls.h"
+#include <iostream>
 
 int main()
 {
@@ -8,4 +8,3 @@ int main()
 
     return 0;
 }
-

@@ -1,18 +1,10 @@
-#include <iostream>
-#include <GL/glew.h>
 #include "window.h"
-
-Window::Window()
-{
-    mWidth = 0;
-    mHeight = 0;
-    mTitle.clear();
-}
+#include <GL/glew.h>
+#include <iostream>
 
 bool Window::Init()
 {
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-    {
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         cerr << "Cannot init SDL: " + string(SDL_GetError());
         return false;
     }
@@ -20,22 +12,19 @@ bool Window::Init()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, true);
     if (!(mWindow = SDL_CreateWindow(
               mTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-              mWidth, mHeight, SDL_WINDOW_OPENGL)))
-    {
+              mWidth, mHeight, SDL_WINDOW_OPENGL))) {
         cerr << "Cannot create window: " + string(SDL_GetError());
         return false;
     }
-    if (!(mGLContext = SDL_GL_CreateContext(mWindow)))
-    {
+    if (!(mGLContext = SDL_GL_CreateContext(mWindow))) {
         cerr << "Cannot create GL context: " + string(SDL_GetError());
         return false;
     }
-    if (glewInit() != GLEW_OK)
-    {
+    if (glewInit() != GLEW_OK) {
         cerr << "Cannot init glew";
         return false;
     }
-    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     setSwapInterval(0);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -45,7 +34,7 @@ bool Window::Init()
     return true;
 }
 
-void Window::setTitle(const string &title)
+void Window::setTitle(const string& title)
 {
     mTitle = title;
     SDL_SetWindowTitle(mWindow, mTitle.c_str());

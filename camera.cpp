@@ -1,11 +1,10 @@
-#include <iostream>
 #define GLM_FORCE_RADIANS
-#include <GL/glew.h>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include "camera.h"
+#include <GL/glew.h>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/transform.hpp>
 
-Camera::Camera(){}
+Camera::Camera() {}
 
 Camera::Camera(float screenWidth, float screenHeight, float scale, float speed)
 {
@@ -28,8 +27,10 @@ void Camera::ComputeMatrix()
     glm::mat4 Projection = glm::ortho(0.0f, mScrDim.x, 0.0f, mScrDim.y, -1.0f, 1.0f);
     glm::mat4 View = glm::mat4(1);
     glm::mat4 Scale = glm::scale(glm::mat4(1), glm::vec3(mScale));
-    glm::mat4 Translate = glm::translate(glm::mat4(1), glm::vec3(-mPos.x*mScale + mScrDim.x / 2, -mPos.y*mScale + mScrDim.y / 2, 0)); 
-    glm::mat4 Model =  Translate * Scale;
+    glm::mat4 Translate = glm::translate(
+        glm::mat4(1),
+        glm::vec3(-mPos.x * mScale + mScrDim.x / 2, -mPos.y * mScale + mScrDim.y / 2, 0));
+    glm::mat4 Model = Translate * Scale;
 
     mMatrix = Projection * View * Model;
     // std::cout << glm::to_string(mMatrix) << std::endl;
@@ -44,7 +45,7 @@ glm::mat4 Camera::GetMatrix()
     return mMatrix;
 }
 
-void Camera::SetMatrix(uint programId, const std::string &name)
+void Camera::SetMatrix(uint programId, const std::string& name)
 {
     GLint pLoc = glGetUniformLocation(programId, name.c_str());
     if (mDirty)

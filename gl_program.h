@@ -1,29 +1,26 @@
 #pragma once
 
-#include <iostream>
 #include <GL/glew.h>
+#include <string>
 
-using namespace std;
-
-class GLProgram
-{
-  public:
+class GLProgram {
+public:
     GLProgram();
     ~GLProgram();
-    bool Create(const string &shadersPath);
-    void addAttribute(const string &name);
-    GLint getAttribute(const string &name);
+    bool Create(const std::string& shadersPath);
+    void addAttribute(const std::string& name);
+    GLint getAttribute(const std::string& name);
     GLuint getId() { return mProgram; }
     GLuint getUniformLocation(const std::string& uniformName);
     void Use();
     void Unuse();
 
-  private:
+private:
     GLuint mProgram;
     GLuint mVertexShader;
     GLuint mFragmentShader;
     GLuint mNumAttributes;
-    bool CompileShader(const string &shaderCode, GLuint shaderID, const string &name);
-    bool CompileShaders(const string &shadersPath);
+    bool CompileShader(const std::string& shaderCode, GLuint shaderID, const std::string& name);
+    bool CompileShaders(const std::string& shadersPath);
     bool LinkShaders();
 };

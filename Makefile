@@ -5,10 +5,10 @@ LIBS=-lstdc++ -lSDL2 -lGL -lGLEW -lm
 OFLAGS=-c
 CFLAGS=-g3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
 
-OBJECTS=main.o window.o game.o input_manager.o timer.o camera.o entity.o gl_program.o mesh.o \
+OBJECTS=main.o window.o game.o input_manager.o timer.o camera.o gl_program.o \
 		rectangle.o filled_rectangle.o \
 		lodepng/lodepng.o texture.o texture_manager.o sprite.o renderer.o \
-		balls.o
+		ball.o balls.o aabb.o
 
 TARGET=evelight
 

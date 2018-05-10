@@ -1,6 +1,6 @@
 #include "filled_rectangle.h"
 
-FilledRectangle::FilledRectangle(float x, float y, float width, float height, const Color &color)
+FilledRectangle::FilledRectangle(float x, float y, float width, float height, const Color& color)
 {
     mVertices.resize(4);
     mIndexes = { LB, LT, RT, RT, RB, LB };

@@ -5,12 +5,12 @@ InputManager::InputManager()
     mQuit = false;
 }
 
-void InputManager::SetKey(uint32_t key)
+void InputManager::SetKey(uint key)
 {
-    mKeys.insert(pair<int, bool>(key, true));
+    mKeys.insert(std::pair<int, bool>(key, true));
 }
 
-void InputManager::ResetKey(uint32_t key)
+void InputManager::ResetKey(uint key)
 {
     mKeys.erase(key);
 }
@@ -19,8 +19,7 @@ void InputManager::ResetKey(uint32_t key)
 bool InputManager::Update()
 {
     SDL_Event e;
-    while (SDL_PollEvent(&e))
-    {
+    while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT)
             mQuit = true;
         if (e.type == SDL_KEYDOWN)
@@ -32,7 +31,7 @@ bool InputManager::Update()
     return true;
 }
 
-bool InputManager::isKeyPressed(uint32_t key)
+bool InputManager::isKeyPressed(uint key)
 {
     return mKeys.find(key) != mKeys.end();
 }

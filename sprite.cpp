@@ -1,11 +1,12 @@
 #include "sprite.h"
 
-Sprite::Sprite(float x, float y, float width, float height, const Color &color, uint texId)
+Sprite::Sprite(float x, float y, float width, float height, const Color& color, uint texId)
     : FilledRectangle(x, y, width, height, color)
 {
     textureId = texId;
 }
 
+/* Deprecated. Draw is made by renderer */
 void Sprite::Draw()
 {
     // // bind texture //

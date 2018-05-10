@@ -1,16 +1,23 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
 #include "vertex.h"
+#include <vector>
+#include <GL/glew.h>
 
-enum DrawType { D_NONE, D_POINTS, D_LINES, D_TRIANGLES, D_MAX };
+enum DrawType {
+    D_NONE,
+    D_POINTS,
+    D_LINES,
+    D_TRIANGLES,
+    D_MAX
+};
 
-struct Renderable
-{
+struct Renderable {
     std::vector<Vertex> mVertices;
     std::vector<int> mIndexes;
     DrawType mDrawType;
     GLuint textureId;
-    Renderable() : textureId(0){};
+    Renderable()
+        : mDrawType(D_NONE)
+        , textureId(0){};
 };

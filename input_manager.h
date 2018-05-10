@@ -1,15 +1,11 @@
-#ifndef INPUT_MANAGER
-#define INPUT_MANAGER
+#pragma once
 
+#include <SDL2/SDL.h>
 #include <cstdint>
 #include <map>
-#include <SDL2/SDL.h>
-
-using namespace std;
 
 // SDL keys mappings //
-enum
-{
+enum {
     K_UNKNOWN = SDLK_UNKNOWN,
     K_RETURN = SDLK_RETURN,
     K_ESCAPE = SDLK_ESCAPE,
@@ -248,20 +244,17 @@ enum
     K_SLEEP = SDLK_SLEEP,
 };
 
-class InputManager
-{
-  public:
+class InputManager {
+public:
     InputManager();
     ~InputManager() {}
     bool Update();
-    bool isKeyPressed(uint32_t key);
+    bool isKeyPressed(uint key);
     bool isQuitRequested();
 
-  private:
-    void SetKey(uint32_t key);
-    void ResetKey(uint32_t key);
+private:
+    void SetKey(uint key);
+    void ResetKey(uint key);
     bool mQuit;
-    map<int, bool> mKeys;
+    std::map<int, bool> mKeys;
 };
-
-#endif

@@ -1,27 +1,22 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
-#include "window.h"
-#include "input_manager.h"
 #include "camera.h"
+#include "input_manager.h"
+#include "window.h"
 
-using namespace std;
-
-class Game
-{
-  public:
-    Game(const string &title, int width, int height);
+class Game {
+public:
+    Game(const string& title, int width, int height);
     ~Game() {}
     bool Start();
     virtual bool onGameInit() { return true; };
-    virtual bool onGameUpdate(uint32_t diffTicks) = 0;
+    virtual bool onGameUpdate(uint diffTicks) = 0;
     virtual void onGameDelete() {}
 
-  protected:
+protected:
     void Loop();
-    void UpdateFPS(uint32_t ticks);
-    enum
-    {
+    void UpdateFPS(uint ticks);
+    enum {
         GAME_NONE,
         GAME_PLAYING,
         GAME_OVER
@@ -29,10 +24,7 @@ class Game
     Window mWindow;
     InputManager mInMgr;
     Camera mCamera;
-    uint32_t mFPSTicks;
-    uint32_t mFPSNumFrames;
-    uint32_t mFPS;
+    uint mFPSTicks;
+    uint mFPSNumFrames;
+    uint mFPS;
 };
-
-#endif
-

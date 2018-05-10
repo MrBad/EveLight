@@ -1,15 +1,25 @@
-#include <algorithm>
 #include "renderer.h"
+#include <iostream>
+#include <algorithm>
+
+/**
+ * TODO: when adding new Renderable to the queue, generate/find it's appropiate batch in the same time
+ *  and get loose of dirty flag. Also, on delete, remove it from vertices and batch, shrinking indexes buffer and vertices.
+ * When adding to a batch, resize and buffer the data to GPU (new size). On vertices upload, on each frame
+ * use glMapBuffer.
+ */
 
 Renderer::Renderer()
-    : mVertexArray(0), mVertexBuffer(0), mIndexBuffer(0), mDirty(true)
+    : mVertexArray(0)
+    , mVertexBuffer(0)
+    , mIndexBuffer(0)
+    , mDirty(true)
 {
 }
 
 void Renderer::Init()
 {
-    enum shader_attrs
-    {
+    enum shader_attrs {
         POSITION,
         COLOR,
         UV,
@@ -22,12 +32,8 @@ void Renderer::Init()
 
     /// Generate buffers and their layout
     glBindVertexArray(mVertexArray);
-
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-    //glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(mVertices[0]), &mVertices[0], GL_DYNAMIC_DRAW);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(mIndexes[0]), &mIndexes[0], GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(POSITION);
     glEnableVertexAttribArray(COLOR);
@@ -35,15 +41,15 @@ void Renderer::Init()
 
     glVertexAttribPointer(
         POSITION, sizeof(mVertices[0].pos) / sizeof(float), GL_FLOAT, GL_FALSE,
-        sizeof(mVertices[0]), (void *)offsetof(Vertex, pos));
+        sizeof(mVertices[0]), (void*)offsetof(Vertex, pos));
 
     glVertexAttribPointer(
         COLOR, sizeof(mVertices[0].color) / sizeof(uint8_t), GL_UNSIGNED_BYTE, GL_TRUE,
-        sizeof(mVertices[0]), (void *)offsetof(Vertex, color));
+        sizeof(mVertices[0]), (void*)offsetof(Vertex, color));
 
     glVertexAttribPointer(
         UV, sizeof(mVertices[0].uv) / sizeof(float), GL_FLOAT, GL_FALSE,
-        sizeof(mVertices[0]), (void *)offsetof(Vertex, uv));
+        sizeof(mVertices[0]), (void*)offsetof(Vertex, uv));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -57,13 +63,13 @@ Renderer::~Renderer()
     glDeleteBuffers(1, &mIndexBuffer);
 }
 
-void Renderer::Add(Renderable *renderable)
+void Renderer::Add(Renderable* renderable)
 {
     mQueue.push_back(renderable);
     mDirty = true;
 }
 
-bool Renderer::Delete(Renderable *renderable)
+bool Renderer::Delete(Renderable* renderable)
 {
     auto it = std::remove(mQueue.begin(), mQueue.end(), renderable);
     mQueue.erase(it);
@@ -73,15 +79,15 @@ bool Renderer::Delete(Renderable *renderable)
 
 /**
  * Gets a batch having drawType and textureId.
- * If it cannot find one, will create one with given vertices offset and indexes offset
+ * If it cannot find one, will create one with given vertices indexes offsets
  */
-RenderBatch *Renderer::GetBatch(DrawType drawType, GLuint textureId, uint verticesOffs, uint indexesOffs)
+RenderBatch* Renderer::GetBatch(
+    DrawType drawType, GLuint textureId, uint verticesOffs, uint indexesOffs)
 {
     RenderBatch batch(verticesOffs, indexesOffs, drawType, textureId);
     auto it = std::find(mBatches.begin(), mBatches.end(), batch);
 
-    if (it == mBatches.end())
-    {
+    if (it == mBatches.end()) {
         // std::cout << "new batch" << std::endl;
         RenderBatch batch(verticesOffs, indexesOffs, drawType, textureId);
         mBatches.push_back(batch);
@@ -94,9 +100,9 @@ RenderBatch *Renderer::GetBatch(DrawType drawType, GLuint textureId, uint vertic
 /**
  * Builds batches, so we can have only one vertex buffer and one index buffer, 
  * but keeping different offsets into them
- * This way the buffering to GPU will be done in one chunk (actually 2) and draw calls will be minimized.
+ * This way the buffering to GPU will be done in one chunk (actually 2) and draw
+ * calls will be minimized.
  * TODO - clean code, I don't think I need vertex offset, nor vertex size
- *      + keep a dirty flag so we don't re-sort too often, or build the batches without sorting - no sort needed.
  *      - use glMapBuffer and write vertices and indexes directly on a GPU mapped memory.
  */
 void Renderer::BuildBatches()
@@ -108,12 +114,10 @@ void Renderer::BuildBatches()
     DrawType lastDrawType = D_NONE;
     GLuint lastTextureId = 0;
     uint verticesOffs = 0, indexesOffs = 0;
-    RenderBatch *batch;
+    RenderBatch* batch = nullptr;
 
-    for (uint i = 0; i < mQueue.size(); i++)
-    {
-        if (lastDrawType != mQueue[i]->mDrawType || lastTextureId != mQueue[i]->textureId)
-        {
+    for (uint i = 0; i < mQueue.size(); i++) {
+        if (lastDrawType != mQueue[i]->mDrawType || lastTextureId != mQueue[i]->textureId) {
             lastDrawType = mQueue[i]->mDrawType;
             lastTextureId = mQueue[i]->textureId;
             batch = GetBatch(lastDrawType, lastTextureId, verticesOffs, indexesOffs);
@@ -130,7 +134,17 @@ void Renderer::BuildBatches()
         batch->numIndexes += mQueue[i]->mIndexes.size();
     }
     mDirty = false;
-    // PrintBatches();
+}
+
+/**
+ * Vertices needs to be rebuilt each frame, because the world is dynamic.
+ */
+void Renderer::RebuildVertices()
+{
+    mVertices.clear();
+    for (uint i = 0; i < mQueue.size(); i++)
+        for (uint j = 0; j < mQueue[i]->mVertices.size(); j++)
+            mVertices.emplace_back(mQueue[i]->mVertices[j]);
 }
 
 /**
@@ -141,6 +155,8 @@ void Renderer::Draw()
 
     if (mDirty)
         BuildBatches();
+    else
+        RebuildVertices();
 
     glBindVertexArray(mVertexArray);
 
@@ -151,11 +167,9 @@ void Renderer::Draw()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(mIndexes[0]), &mIndexes[0], GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
-    for (uint i = 0; i < mBatches.size(); i++)
-    {
+    for (uint i = 0; i < mBatches.size(); i++) {
         GLuint drawType;
-        switch (mBatches[i].drawType)
-        {
+        switch (mBatches[i].drawType) {
         case D_POINTS:
             drawType = GL_POINTS;
             break;
@@ -169,14 +183,13 @@ void Renderer::Draw()
             return;
         }
         glBindTexture(GL_TEXTURE_2D, mBatches[i].textureId);
-        glDrawElements(drawType, mBatches[i].numIndexes, GL_UNSIGNED_INT, (void *)(mBatches[i].indexOffs * sizeof(int)));
+        glDrawElements(drawType, mBatches[i].numIndexes, GL_UNSIGNED_INT, (void*)(mBatches[i].indexOffs * sizeof(int)));
     }
 }
 
 void Renderer::PrintBatches()
 {
-    for (uint i = 0; i < mBatches.size(); i++)
-    {
+    for (uint i = 0; i < mBatches.size(); i++) {
         std::cout << "dtype: " << (mBatches[i].drawType == D_LINES ? "lines" : "triangles")
                   << ", texture id: " << mBatches[i].textureId
                   << ", verticesOffs: " << mBatches[i].verticesOffs

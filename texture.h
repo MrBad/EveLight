@@ -2,24 +2,23 @@
 
 #include <GL/glew.h>
 #include <iostream>
-#include <vector>
 #include <map>
+#include <vector>
 
 using namespace std;
 
-class Texture
-{
-  public:
+class Texture {
+public:
     Texture();
-    Texture(const string &name, uint width, uint height, std::vector<uint8_t> &imageBuf);
+    Texture(const string& name, uint width, uint height, std::vector<uint8_t>& imageBuf);
     ~Texture();
     uint getWidth() { return mWidth; }
     uint getHeight() { return mHeight; }
     uint getId() { return mId; }
-    std::string &getName() { return mName; }
+    std::string& getName() { return mName; }
 
-  private:
-    void Upload(std::vector<unsigned char> &imageBuf);
+private:
+    void Upload(const std::vector<unsigned char>& imageBuf);
     GLuint mId;
     uint mWidth, mHeight;
     std::string mName;

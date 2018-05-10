@@ -1,8 +1,12 @@
-#include "vertex.h"
 #include "rectangle.h"
+#include "vertex.h"
 
 Rectangle::Rectangle(float x, float y, float width, float height, const Color& color)
-    : mX(x), mY(y), mWidth(width), mHeight(height), mColor(color)
+    : mX(x)
+    , mY(y)
+    , mWidth(width)
+    , mHeight(height)
+    , mColor(color)
 {
     mVertices.resize(4);
     mIndexes = { LB, LT, LT, RT, RT, RB, RB, LB };
@@ -19,10 +23,10 @@ void Rectangle::SetPos(float x, float y)
     BuildVertices();
 }
 
-void Rectangle::SetColor(const Color &color)
+void Rectangle::SetColor(const Color& color)
 {
-   mColor = color;
-   BuildVertices();
+    mColor = color;
+    BuildVertices();
 }
 
 void Rectangle::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)

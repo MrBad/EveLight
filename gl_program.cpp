@@ -1,14 +1,14 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include "gl_program.h"
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 GLProgram::GLProgram()
 {
     mProgram = mVertexShader = mFragmentShader = mNumAttributes = 0;
 }
 
-bool GLProgram::Create(const string &shadersPath)
+bool GLProgram::Create(const std::string& shadersPath)
 {
     mProgram = glCreateProgram();
     mVertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -36,15 +36,14 @@ GLProgram::~GLProgram()
     glDeleteProgram(mProgram);
 }
 
-static bool fileGet(const string &path, string &content)
+static bool fileGet(const std::string& path, std::string& content)
 {
     content.clear();
-    string line;
+    std::string line;
 
-    ifstream file(path);
-    if (file.fail())
-    {
-        cerr << "Cannot open file: " << path << endl;
+    std::ifstream file(path);
+    if (file.fail()) {
+        std::cerr << "Cannot open file: " << path << std::endl;
         return false;
     }
     while (getline(file, line))
@@ -54,25 +53,25 @@ static bool fileGet(const string &path, string &content)
     return true;
 }
 
-bool GLProgram::CompileShader(const string &shaderCode, GLuint shaderID, const string &name)
+bool GLProgram::CompileShader(const std::string& shaderCode, GLuint shaderID,
+    const std::string& name)
 {
-    const char *ptr = shaderCode.c_str();
+    const char* ptr = shaderCode.c_str();
     glShaderSource(shaderID, 1, &ptr, nullptr);
     glCompileShader(shaderID);
 
     GLint success = GL_FALSE;
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-    if (success == GL_FALSE)
-    {
+    if (success == GL_FALSE) {
         GLint maxLen;
         glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLen);
 
-        vector<char> logMessage(maxLen);
+        std::vector<char> logMessage(maxLen);
         glGetShaderInfoLog(shaderID, maxLen, &maxLen, &logMessage[0]);
 
         glDeleteShader(shaderID);
-        cerr << "Error in shader: " << name << endl;
-        cerr << &logMessage[0] << endl;
+        std::cerr << "Error in shader: " << name << std::endl;
+        std::cerr << &logMessage[0] << std::endl;
         return false;
     }
 
@@ -87,8 +86,7 @@ bool GLProgram::LinkShaders()
 
     GLint success = GL_FALSE;
     glGetProgramiv(mProgram, GL_LINK_STATUS, &success);
-    if (success == GL_FALSE)
-    {
+    if (success == GL_FALSE) {
         GLint maxLen;
         glGetProgramiv(mProgram, GL_INFO_LOG_LENGTH, &maxLen);
         std::vector<char> logMessage(maxLen);
@@ -100,17 +98,17 @@ bool GLProgram::LinkShaders()
         glDeleteShader(mVertexShader);
         glDeleteShader(mFragmentShader);
 
-        cerr << "Error in linking shaders!" << endl;
-        cerr << &logMessage[0] << endl;
+        std::cerr << "Error in linking shaders!" << std::endl;
+        std::cerr << &logMessage[0] << std::endl;
         return false;
     }
 
     return true;
 }
 
-bool GLProgram::CompileShaders(const std::string &shadersPath)
+bool GLProgram::CompileShaders(const std::string& shadersPath)
 {
-    string shaderContent;
+    std::string shaderContent;
 
     if (!fileGet(shadersPath + ".vs", shaderContent))
         return false;
@@ -124,26 +122,29 @@ bool GLProgram::CompileShaders(const std::string &shadersPath)
     return true;
 }
 
-void GLProgram::addAttribute(const string &name)
+void GLProgram::addAttribute(const std::string& name)
 {
     glBindAttribLocation(mProgram, mNumAttributes++, name.c_str());
 }
 
-GLint GLProgram::getAttribute(const string &name)
+GLint GLProgram::getAttribute(const std::string& name)
 {
     return glGetAttribLocation(mProgram, name.c_str());
 }
-GLuint GLProgram::getUniformLocation(const std::string &uniformName)
+
+GLuint GLProgram::getUniformLocation(const std::string& uniformName)
 {
     GLint location = glGetUniformLocation(mProgram, uniformName.c_str());
-    if ((unsigned)location == GL_INVALID_INDEX)
-    {
-        cerr << location;
-        cerr << "Uniform: " << uniformName << " not found in shader for program " << mProgram << endl;
+    if ((unsigned)location == GL_INVALID_INDEX) {
+        std::cerr << "; Uniform: " << uniformName
+                  << " not found in shader for program " << mProgram
+                  << std::endl;
         return 0;
     }
+
     return location;
 }
+
 void GLProgram::Use()
 {
     glUseProgram(mProgram);

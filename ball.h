@@ -1,17 +1,12 @@
 #pragma once
 
-#include "sprite.h"
+#include "entity.h"
 #include <glm/glm.hpp>
 
-class Ball : public Sprite {
+class Ball : public Entity {
 public:
-    Ball(float x, float y, float width, float height, const Color& color, uint texId);
-    ~Ball();
+    Ball(float x, float y, float width, float height, uint texId);
+    ~Ball() {}
     float GetRadius() { return mWidth / 2; }
-    void SetVelocity(const glm::vec2& velocity);
-    glm::vec2 GetVelocity() { return mVelocity; }
-    void Update(uint ticks);
-
-private:
-    glm::vec2 mVelocity;
+    void Update(Game *game, uint ticks) override;
 };

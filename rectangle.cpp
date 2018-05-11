@@ -7,6 +7,7 @@ Rectangle::Rectangle(float x, float y, float width, float height, const Color& c
     , mWidth(width)
     , mHeight(height)
     , mColor(color)
+    , mUV(0, 0, 1, 1)
 {
     mVertices.resize(4);
     mIndexes = { LB, LT, LT, RT, RT, RB, RB, LB };
@@ -21,6 +22,11 @@ void Rectangle::SetPos(float x, float y)
     mX = x;
     mY = y;
     BuildVertices();
+}
+
+void Rectangle::SetPos(const glm::vec2& pos)
+{
+    SetPos(pos.x, pos.y);
 }
 
 void Rectangle::SetColor(const Color& color)
@@ -45,8 +51,14 @@ void Rectangle::BuildVertices()
     for (uint i = 0; i < mVertices.size(); i++)
         mVertices[i].SetColor(mColor);
 
-    mVertices[LB].SetUV(0, 0);
-    mVertices[LT].SetUV(0, 1);
-    mVertices[RT].SetUV(1, 1);
-    mVertices[RB].SetUV(1, 0);
+    mVertices[LB].SetUV(mUV.minX, mUV.minY);
+    mVertices[LT].SetUV(mUV.minX, mUV.maxY);
+    mVertices[RT].SetUV(mUV.maxX, mUV.maxY);
+    mVertices[RB].SetUV(mUV.maxX, mUV.minY);
+}
+
+void Rectangle::SetUV(AABB uv)
+{
+    mUV = uv;
+    BuildVertices();
 }

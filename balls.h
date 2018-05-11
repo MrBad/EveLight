@@ -1,15 +1,21 @@
 #pragma once
 
-#include "ball.h"
+#include "entity.h"
 #include "game.h"
 #include "gl_program.h"
-#include "mesh.h"
+#include "multi_sprite.h"
 #include "rectangle.h"
 #include "renderer.h"
 #include "sprite.h"
 #include "texture.h"
 #include "texture_manager.h"
 #include <GL/glew.h>
+
+enum EntityType {
+    BALL,
+    BRICK,
+    PLAYER
+};
 
 class Balls : public Game {
 public:
@@ -27,10 +33,13 @@ private:
     TextureManager mTexMgr;
     Renderer mRenderer;
 
-    vector<Sprite*> mBricks;
-    vector<Ball*> mBalls;
+    std::vector<Entity*> mEntities;
+    Entity* mPlayer;
+
     uint mMapX, mMapY;
 
-    void updateCamera(uint ticks);
+    void CameraUpdate(uint ticks);
     void buildMap();
+    void DynamicStaticCollision(Entity *eDynamic, Entity *eStatic);
+    void DynamicDynamicCollision(Entity *a, Entity *b);
 };

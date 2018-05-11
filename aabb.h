@@ -9,7 +9,10 @@ public:
     bool FitsIn(const AABB& other);
     /* Gets the distance between center of rectangles. */
     glm::vec2 GetDistance(const AABB& other);
+    float GetWidth() { return maxX - minX; }
+    float GetHeight() { return maxY - minY; }
+    glm::vec2 GetMin() { return glm::vec2(minX, minY); }
+    glm::vec2 GetMax() { return glm::vec2(maxX, maxY); }
 
-private:
-    float mMinX, mMinY, mMaxX, mMaxY;
+    float minX, minY, maxX, maxY;
 };

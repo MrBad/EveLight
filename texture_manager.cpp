@@ -18,7 +18,7 @@ Texture* TextureManager::Get(const std::string& name)
 
 bool TextureManager::Add(const std::string& name, Texture* texture)
 {
-    auto ret = mTextures.insert(pair<string, Texture*>(name, texture));
+    auto ret = mTextures.insert(std::pair<std::string, Texture*>(name, texture));
     if (ret.second == false) {
         std::cerr << "Texture " << name << " already added" << std::endl;
         return false;

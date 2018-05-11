@@ -5,12 +5,10 @@
 #include <map>
 #include <vector>
 
-using namespace std;
-
 class Texture {
 public:
     Texture();
-    Texture(const string& name, uint width, uint height, std::vector<uint8_t>& imageBuf);
+    Texture(const std::string& name, uint width, uint height, std::vector<uint8_t>& imageBuf);
     ~Texture();
     uint getWidth() { return mWidth; }
     uint getHeight() { return mHeight; }

@@ -1,37 +1,40 @@
 #include "aabb.h"
 
 AABB::AABB(float x1, float y1, float x2, float y2)
-    : mMinX(x1), mMinY(y1), mMaxX(x2), mMaxY(y2)
+    : minX(x1)
+    , minY(y1)
+    , maxX(x2)
+    , maxY(y2)
 {
 }
 
-bool AABB::Intersects(const AABB &other)
+bool AABB::Intersects(const AABB& other)
 {
-    assert(mMinX < mMaxX);
-    assert(mMinY < mMaxY);
-    assert(other.mMinX < other.mMaxX);
-    assert(other.mMinY < other.mMaxY);
+    assert(minX < maxX);
+    assert(minY < maxY);
+    assert(other.minX < other.maxX);
+    assert(other.minY < other.maxY);
 
-    return (mMinX < other.mMaxX &&
-            mMaxX > other.mMinX &&
-            mMinY < other.mMaxY &&
-            mMaxY > other.mMinY);
+    return (minX < other.maxX &&
+            maxX > other.minX &&
+            minY < other.maxY &&
+            maxY > other.minY);
 }
 
-bool AABB::FitsIn(const AABB &other)
+bool AABB::FitsIn(const AABB& other)
 {
-    return (mMinX > other.mMinX &&
-            mMaxX <= other.mMaxX &&
-            mMinY > other.mMinY &&
-            mMaxY <= other.mMaxY);
+    return (minX > other.minX &&
+            maxX <= other.maxX &&
+            minY > other.minY &&
+            maxY <= other.maxY);
 }
 
-glm::vec2 AABB::GetDistance(const AABB &other)
+glm::vec2 AABB::GetDistance(const AABB& other)
 {
-    glm::vec2 center(mMinX + 0.5f * (mMaxX - mMinX), mMinY + 0.5f * (mMaxY - mMinY));
+    glm::vec2 center(minX + 0.5f * (maxX - minX), minY + 0.5f * (maxY - minY));
     glm::vec2 otherCenter(
-        other.mMinX + 0.5f * (other.mMaxX - other.mMinX),
-        other.mMinY + 0.5f * (other.mMaxY - other.mMinY));
+        other.minX + 0.5f * (other.maxX - other.minX),
+        other.minY + 0.5f * (other.maxY - other.minY));
 
     return otherCenter - center;
 }

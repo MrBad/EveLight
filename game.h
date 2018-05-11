@@ -12,6 +12,9 @@ public:
     virtual bool onGameInit() { return true; };
     virtual bool onGameUpdate(uint diffTicks) = 0;
     virtual void onGameDelete() {}
+    
+    InputManager mInMgr;
+    Camera mCamera;
 
 protected:
     void Loop();
@@ -22,8 +25,6 @@ protected:
         GAME_OVER
     } mState;
     Window mWindow;
-    InputManager mInMgr;
-    Camera mCamera;
     uint mFPSTicks;
     uint mFPSNumFrames;
     uint mFPS;

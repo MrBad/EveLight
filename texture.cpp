@@ -1,18 +1,18 @@
 #include "texture.h"
 #include "lodepng/lodepng.h"
 
-Texture::~Texture()
+Texture::Texture(const std::string& name, uint width, uint height, std::vector<uint8_t>& imageBuf)
+    : mWidth(width)
+    , mHeight(height)
+    , mName(name)
 {
-    cout << "Texture deleted\n";
-    glDeleteTextures(1, &mId);
+    Upload(imageBuf);
 }
 
-Texture::Texture(const string& name, uint width, uint height, std::vector<uint8_t>& imageBuf)
+Texture::~Texture()
 {
-    mName = name;
-    mWidth = width;
-    mHeight = height;
-    Upload(imageBuf);
+    std::cout << "Texture deleted\n";
+    glDeleteTextures(1, &mId);
 }
 
 void Texture::Upload(const std::vector<unsigned char>& imageBuf)

@@ -13,7 +13,7 @@
 
 const int TSZ = 40;
 const int BSZ = 32;
-const int NUM_BALLS = 50;
+const int NUM_BALLS = 0;
 
 void Balls::buildMap()
 {
@@ -26,7 +26,7 @@ void Balls::buildMap()
                       "#   #      ######  #\n"
                       "#   ####           #\n"
                       "#                  #\n"
-                      "#                  #\n"
+                      "#    #             #\n"
                       "#                  #\n"
                       "#                  #\n"
                       "#    ##            #\n"
@@ -125,29 +125,31 @@ void Balls::CameraUpdate(uint ticks)
 void Balls::DynamicStaticCollision(Entity* eDynamic, Entity* eStatic)
 {
     // Ball | User Brick collision
-    AABB eDynamicAABB = eDynamic->GetAABB();
-    AABB eStaticAABB = eStatic->GetAABB();
-
-    glm::vec2 distance = eDynamicAABB.GetDistance(eStaticAABB);
-    glm::vec2 newPos = eDynamic->GetPos();
+    AABB dynAABB = eDynamic->GetAABB();
+    AABB statAABB = eStatic->GetAABB();
+    glm::vec2 distance = dynAABB.GetDistance(statAABB);
     glm::vec2 depth(0);
+    glm::vec2 vel = glm::normalize(eDynamic->GetVelocity());
     if (fabsf(distance.x) > fabsf(distance.y)) {
-        if (distance.x < 0) // left
-            newPos.x = eStatic->GetX() + eStatic->GetWidth();
+        if (distance.x < 0)// dynamic obj left collision
+            depth.x = (statAABB.maxX - dynAABB.minX);
         else if (distance.x > 0) // right
-            newPos.x = eStatic->GetX() - eDynamic->GetWidth();
-        eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(-1, 1));
-    } else {
-        if (distance.y < 0) // bottom
-            newPos.y = eStatic->GetY() + eStatic->GetHeight();
-        else if (distance.y > 0) // top
-            newPos.y = eStatic->GetY() - eDynamic->GetHeight();
-        eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(1, -1));
+            depth.x = -(dynAABB.maxX - statAABB.minX);
+        if (eDynamic->GetType() == BALL)
+            eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(-1, 1));
     }
-
-    eDynamic->SetPos(newPos);
-    assert(newPos.x > 0 && newPos.x < mMapX * TSZ);
-    assert(newPos.y > 0 && newPos.y < mMapY * TSZ);
+    else {
+        if (distance.y < 0) // bottom
+            depth.y = statAABB.maxY - dynAABB.minY;
+        else if (distance.y > 0) // top
+            depth.y = -(dynAABB.maxY - statAABB.minY);
+        if (eDynamic->GetType() == BALL)
+            eDynamic->SetVelocity(eDynamic->GetVelocity()* glm::vec2(1, -1));
+    }
+    float dot = depth.x * vel.x + depth.y * vel.y;
+    float vecMag = sqrt(vel.x * vel.x + vel.y * vel.y);
+    depth = (dot / vecMag) * vel;
+    eDynamic->SetPos(eDynamic->GetPos() + depth);
 }
 
 void Balls::DynamicDynamicCollision(Entity* a, Entity* b)

@@ -2,14 +2,14 @@
 #include "game.h"
 
 Player::Player(float x, float y, float width, float height, uint texId)
-    : Entity(x, y, width, height, texId),
-    mAnimSpeed(0.01f),
-    mSpeed(0.3f)
+    : Entity(x, y, width, height, texId)
+    , mAnimSpeed(0.01f)
+    , mSpeed(0.1f)
 {
     SetStatic(false);
 }
 
-void Player::Update(Game *game, uint ticks)
+void Player::Update(Game* game, uint ticks)
 {
     enum {
         P_STOP,
@@ -21,18 +21,18 @@ void Player::Update(Game *game, uint ticks)
         F_UP,
         F_RIGHT
     };
-    
+
     glm::vec2 velocity = glm::vec2(0);
 
     if (game->mInMgr.isKeyPressed(K_w))
         velocity.y = 1;
     else if (game->mInMgr.isKeyPressed(K_s))
         velocity.y = -1;
-    else if (game->mInMgr.isKeyPressed(K_a))
+    if (game->mInMgr.isKeyPressed(K_a))
         velocity.x = -1;
     else if (game->mInMgr.isKeyPressed(K_d))
         velocity.x = 1;
-    
+
     velocity *= mSpeed;
 
     glm::vec2 pos = GetPos();
@@ -54,7 +54,7 @@ void Player::Update(Game *game, uint ticks)
         pFace = F_UP;
     else
         pState = P_STOP;
-    
+
     frameX = pState * ((frameX + mAnimSpeed * ticks));
     if (frameX > 5.0f)
         frameX = 0;

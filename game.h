@@ -1,8 +1,10 @@
 #pragma once
 
 #include "camera.h"
+#include "entity.h"
 #include "input_manager.h"
 #include "window.h"
+#include <vector>
 
 class Game {
 public:
@@ -12,9 +14,11 @@ public:
     virtual bool onGameInit() { return true; };
     virtual bool onGameUpdate(uint diffTicks) = 0;
     virtual void onGameDelete() {}
-    
+
     InputManager mInMgr;
     Camera mCamera;
+
+    std::vector<Entity*>& GetEntities() { return mEntities; }
 
 protected:
     void Loop();
@@ -28,4 +32,5 @@ protected:
     uint mFPSTicks;
     uint mFPSNumFrames;
     uint mFPS;
+    std::vector<Entity*> mEntities;
 };

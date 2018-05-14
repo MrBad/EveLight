@@ -11,4 +11,7 @@ public:
 
 private:
     float mAnimSpeed, mSpeed;
+    bool CheckCollisions(Game* game, uint ticks, glm::vec2& newPos);
+    void BrickCollision(glm::vec2& newPos, Entity* brick);
+    void BallCollision(Game* game, uint ticks, glm::vec2& newPos, Entity* other);
 };

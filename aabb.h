@@ -14,4 +14,5 @@ struct AABB {
     float GetHeight() { return maxY - minY; }
     glm::vec2 GetMin() { return glm::vec2(minX, minY); }
     glm::vec2 GetMax() { return glm::vec2(maxX, maxY); }
+    glm::vec2 GetCenter() { return glm::vec2(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2); }
 };

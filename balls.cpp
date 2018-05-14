@@ -11,23 +11,23 @@
 #include <random>
 #include <vector>
 
-const int TSZ = 40;
+const int TSZ = 32;
 const int BSZ = 32;
-const int NUM_BALLS = 0;
+const int NUM_BALLS = 10;
 
 void Balls::buildMap()
 {
 
     std::string map = "####################\n"
                       "#                  #\n"
-                      "#   ####    ###    #\n"
-                      "#   #              #\n"
-                      "#   ####           #\n"
-                      "#   #      ######  #\n"
+                      "#                  #\n"
+                      "#   ####    ###### #\n"
+                      "#   #            # #\n"
+                      "#   ####         # #\n"
+                      "#   #      ####### #\n"
                       "#   ####           #\n"
                       "#                  #\n"
-                      "#    #             #\n"
-                      "#                  #\n"
+                      "#    #         #####\n"
                       "#                  #\n"
                       "#    ##            #\n"
                       "#            ###   #\n"
@@ -96,7 +96,7 @@ bool Balls::onGameInit()
     }
 
     // Player
-    mPlayer = new Player(100, 100, 32, 64, mTexMgr.Get("player")->getId());
+    mPlayer = new Player(300, 300, 32, 64, mTexMgr.Get("player")->getId());
     mPlayer->SetNumFrames(6, 4);
     mPlayer->SetType(PLAYER);
     mRenderer.Add(mPlayer);
@@ -127,29 +127,42 @@ void Balls::DynamicStaticCollision(Entity* eDynamic, Entity* eStatic)
     // Ball | User Brick collision
     AABB dynAABB = eDynamic->GetAABB();
     AABB statAABB = eStatic->GetAABB();
-    glm::vec2 distance = dynAABB.GetDistance(statAABB);
+    glm::vec2 vel = eDynamic->GetVelocity();
+    glm::vec2 dist = dynAABB.GetDistance(statAABB);
     glm::vec2 depth(0);
-    glm::vec2 vel = glm::normalize(eDynamic->GetVelocity());
-    if (fabsf(distance.x) > fabsf(distance.y)) {
-        if (distance.x < 0)// dynamic obj left collision
-            depth.x = (statAABB.maxX - dynAABB.minX);
-        else if (distance.x > 0) // right
-            depth.x = -(dynAABB.maxX - statAABB.minX);
-        if (eDynamic->GetType() == BALL)
-            eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(-1, 1));
+
+    if (vel.x <= 0) {
+        depth.x = dynAABB.minX - statAABB.maxX;
+    } else {
+        depth.x = dynAABB.maxX - statAABB.minX;
     }
-    else {
-        if (distance.y < 0) // bottom
-            depth.y = statAABB.maxY - dynAABB.minY;
-        else if (distance.y > 0) // top
-            depth.y = -(dynAABB.maxY - statAABB.minY);
-        if (eDynamic->GetType() == BALL)
-            eDynamic->SetVelocity(eDynamic->GetVelocity()* glm::vec2(1, -1));
+#if 0
+    if (vel.x != 0) {
+        if (vel.x < 0) {
+            depth.x = dynAABB.minX - statAABB.maxX;
+        } else {
+            depth.x = dynAABB.maxX - statAABB.minX;
+        }
+    } else {
+        if (vel.y < 0)
+            depth.y = dynAABB.minY - statAABB.maxY;
+        else
+            depth.y = dynAABB.maxY - statAABB.minY;
     }
+
+    vel = glm::normalize(vel);
     float dot = depth.x * vel.x + depth.y * vel.y;
     float vecMag = sqrt(vel.x * vel.x + vel.y * vel.y);
     depth = (dot / vecMag) * vel;
-    eDynamic->SetPos(eDynamic->GetPos() + depth);
+#endif
+    glm::vec2 pos = eDynamic->GetPos() - depth;
+    eDynamic->SetPos(pos);
+    if (eDynamic->GetType() == BALL) {
+        if (fabs(dist.x) > fabs(dist.y))
+            eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(-1, 1));
+        else
+            eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(1, -1));
+    }
 }
 
 void Balls::DynamicDynamicCollision(Entity* a, Entity* b)
@@ -194,25 +207,25 @@ bool Balls::onGameUpdate(uint32_t ticks)
     for (uint i = 0; i < mEntities.size(); i++) {
         mEntities[i]->Update(this, ticks);
     }
-    for (uint i = 0; i < mEntities.size(); i++) {
-        Entity* a = mEntities[i];
-        for (uint j = i + 1; j < mEntities.size(); j++) {
-            Entity* b = mEntities[j];
-            if (a->isStatic() && b->isStatic())
-                continue;
-            AABB aAABB = a->GetAABB();
-            AABB bAABB = b->GetAABB();
-            if (!(aAABB.Intersects(bAABB)))
-                continue;
-            // We have a collision
-            if (!a->isStatic() && b->isStatic())
-                DynamicStaticCollision(a, b);
-            else if (a->isStatic() && !b->isStatic())
-                DynamicStaticCollision(b, a);
-            else
-                DynamicDynamicCollision(a, b);
-        }
-    }
+    // for (uint i = 0; i < mEntities.size(); i++) {
+    //     Entity* a = mEntities[i];
+    //     for (uint j = i + 1; j < mEntities.size(); j++) {
+    //         Entity* b = mEntities[j];
+    //         if (a->isStatic() && b->isStatic())
+    //             continue;
+    //         AABB aAABB = a->GetAABB();
+    //         AABB bAABB = b->GetAABB();
+    //         if (!(aAABB.Intersects(bAABB)))
+    //             continue;
+    //         // We have a collision
+    //         if (!a->isStatic() && b->isStatic())
+    //             DynamicStaticCollision(a, b);
+    //         else if (a->isStatic() && !b->isStatic())
+    //             DynamicStaticCollision(b, a);
+    //         else
+    //             DynamicDynamicCollision(a, b);
+    //     }
+    // }
 
     CameraUpdate(ticks);
 

@@ -36,8 +36,8 @@ bool Ball::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
         }
         SetPos(newPos);
         if (GetAABB().Intersects(entities[i]->GetAABB())) {
-            printf("Ball collision not solved with %s\n",
-                entities[i]->GetType() == BALL ? "ball" : "brick");
+            // printf("Ball collision not solved with %s\n",
+            //     entities[i]->GetType() == BALL ? "ball" : "brick");
         }
     }
 

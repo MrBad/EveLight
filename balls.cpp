@@ -89,7 +89,8 @@ bool Balls::onGameInit()
             fgen(rng) + (1 + gen(rng) % (mMapY - 2)) * TSZ,
             radius, radius, mTexMgr.Get("circle")->getId());
         ball->SetColor(Color(gen(rng), gen(rng), gen(rng), 200));
-        ball->SetVelocity(glm::vec2(0.05f * fgen(rng), 0.05f * fgen(rng)));
+        // ball->SetVelocity(glm::vec2(0.05f * fgen(rng), 0.05f * fgen(rng)));
+        ball->SetVelocity(glm::vec2(0.0001f * fgen(rng), 0.0001f * fgen(rng)));
         ball->SetType(BALL);
         mRenderer.Add(ball);
         mEntities.push_back(ball);
@@ -207,31 +208,12 @@ bool Balls::onGameUpdate(uint32_t ticks)
     for (uint i = 0; i < mEntities.size(); i++) {
         mEntities[i]->Update(this, ticks);
     }
-    // for (uint i = 0; i < mEntities.size(); i++) {
-    //     Entity* a = mEntities[i];
-    //     for (uint j = i + 1; j < mEntities.size(); j++) {
-    //         Entity* b = mEntities[j];
-    //         if (a->isStatic() && b->isStatic())
-    //             continue;
-    //         AABB aAABB = a->GetAABB();
-    //         AABB bAABB = b->GetAABB();
-    //         if (!(aAABB.Intersects(bAABB)))
-    //             continue;
-    //         // We have a collision
-    //         if (!a->isStatic() && b->isStatic())
-    //             DynamicStaticCollision(a, b);
-    //         else if (a->isStatic() && !b->isStatic())
-    //             DynamicStaticCollision(b, a);
-    //         else
-    //             DynamicDynamicCollision(a, b);
-    //     }
-    // }
 
     CameraUpdate(ticks);
 
     mRenderer.Draw();
 
-    // cout << mFPS << endl;
+    cout << mFPS << endl;
 
     return true;
 }

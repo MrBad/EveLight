@@ -86,8 +86,8 @@ bool Player::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
         }
         SetPos(newPos);
         if (GetAABB().Intersects(entities[i]->GetAABB())) {
-            // printf("Player collision was not solved with %s\n",
-            //     entities[i]->GetType() == BALL ? "ball" : "brick");
+            printf("Player collision was not solved with %s\n",
+                entities[i]->GetType() == BALL ? "ball" : "brick");
         }
     }
 
@@ -99,19 +99,8 @@ void Player::BrickCollision(glm::vec2& newPos, Entity* brick)
     AABB pAABB = GetAABB();
     AABB bAABB = brick->GetAABB();
 
-    glm::vec2 depth(GetWidth(), GetHeight());
+    glm::vec2 depth = pAABB.GetIntersectionDepth(bAABB);
 
-    if (pAABB.minX < bAABB.maxX && bAABB.maxX < pAABB.maxX)
-        depth.x = -(bAABB.maxX - pAABB.minX);
-    else if (pAABB.maxX > bAABB.minX && bAABB.minX > pAABB.minX)
-        depth.x = pAABB.maxX - bAABB.minX;
-    if (pAABB.minY < bAABB.maxY && bAABB.maxY < pAABB.maxY)
-        depth.y = -(bAABB.maxY - pAABB.minY);
-    else if (pAABB.maxY > bAABB.minY && bAABB.minY > pAABB.minY)
-        depth.y = pAABB.maxY - bAABB.minY;
-
-    assert(depth.x != 0.0f);
-    assert(depth.y != 0.0f);
     // TODO - compute the other axis based on velocity vector and do diff also
     // for a more accurate point.
     if (fabs(depth.x) < fabs(depth.y))
@@ -122,4 +111,17 @@ void Player::BrickCollision(glm::vec2& newPos, Entity* brick)
 
 void Player::BallCollision(Game* game, uint ticks, glm::vec2& newPos, Entity* ball)
 {
+    glm::vec2 depth = GetAABB().GetIntersectionDepth(ball->GetAABB());
+    depth *= 0.5f;
+
+    glm::vec2 ballPos = ball->GetPos();
+    if (fabs(depth.x) < fabs(depth.y)) {
+        ballPos.x += depth.x;
+        newPos.x -= depth.x;
+    } else {
+        ballPos.y += depth.y;
+        newPos.y -= depth.y;
+    }
+    // check if pushed ball collides.
+    ball->SetPos(ballPos);
 }

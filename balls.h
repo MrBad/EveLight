@@ -40,6 +40,4 @@ private:
 
     void CameraUpdate(uint ticks);
     void buildMap();
-    void DynamicStaticCollision(Entity* eDynamic, Entity* eStatic);
-    void DynamicDynamicCollision(Entity* a, Entity* b);
 };

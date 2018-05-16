@@ -18,6 +18,7 @@ void Ball::Update(Game* game, uint ticks)
 
 bool Ball::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
 {
+    (void) ticks;
     bool collided = false;
     const std::vector<Entity*> entities = game->GetEntities();
     for (uint i = 0; i < entities.size(); i++) {
@@ -35,10 +36,10 @@ bool Ball::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
             }
         }
         SetPos(newPos);
-        if (GetAABB().Intersects(entities[i]->GetAABB())) {
-            // printf("Ball collision not solved with %s\n",
-            //     entities[i]->GetType() == BALL ? "ball" : "brick");
-        }
+        // if (GetAABB().Intersects(entities[i]->GetAABB())) {
+        //     printf("Ball collision not solved with %s\n",
+        //         entities[i]->GetType() == BALL ? "ball" : "brick");
+        // }
     }
 
     return collided;
@@ -86,7 +87,7 @@ void Ball::BallCollision(glm::vec2& newPos, Entity* other)
     float depth = minDist - dist;
     glm::vec2 v2ColDept = glm::normalize(v2Dist) * depth;
     v2ColDept *= 0.5;
-    SetPos(mX + v2ColDept.x, mY + v2ColDept.y);
+    newPos += v2ColDept;
     other->SetPos(other->GetX() - v2ColDept.x, other->GetY() - v2ColDept.y);
 
     float arc = aRadius * aRadius * aRadius;

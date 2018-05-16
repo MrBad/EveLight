@@ -1,4 +1,5 @@
 #include "player.h"
+#include "ball.h"
 #include "balls.h"
 #include "game.h"
 
@@ -62,6 +63,7 @@ void Player::Update(Game* game, uint ticks)
         frameX = 0;
 
     SetFrame(floor(frameX) + 1, pFace);
+    // update velocity if is not 0 (so we keep track of previous one)
     if (velocity.x || velocity.y)
         mVelocity = velocity;
 }
@@ -86,7 +88,7 @@ bool Player::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
         }
         SetPos(newPos);
         if (GetAABB().Intersects(entities[i]->GetAABB())) {
-            printf("Player collision was not solved with %s\n",
+            printf("Player collision not solved with %s\n",
                 entities[i]->GetType() == BALL ? "ball" : "brick");
         }
     }
@@ -112,16 +114,24 @@ void Player::BrickCollision(glm::vec2& newPos, Entity* brick)
 void Player::BallCollision(Game* game, uint ticks, glm::vec2& newPos, Entity* ball)
 {
     glm::vec2 depth = GetAABB().GetIntersectionDepth(ball->GetAABB());
-    depth *= 0.5f;
 
-    glm::vec2 ballPos = ball->GetPos();
+    glm::vec2 ballNewPos = ball->GetPos();
+
     if (fabs(depth.x) < fabs(depth.y)) {
-        ballPos.x += depth.x;
-        newPos.x -= depth.x;
+        ballNewPos.x += depth.x;
     } else {
-        ballPos.y += depth.y;
-        newPos.y -= depth.y;
+        ballNewPos.y += depth.y;
     }
-    // check if pushed ball collides.
-    ball->SetPos(ballPos);
+    // check if pushed ball collides with something else
+    ((Ball*)ball)->CheckCollisions(game, ticks, ballNewPos);
+
+    if (GetAABB().Intersects(ball->GetAABB())) {
+        // step back player
+        depth = GetAABB().GetIntersectionDepth(ball->GetAABB());
+        if (fabs(depth.x) < fabs(depth.y)) {
+            newPos.x -= depth.x;
+        } else {
+           newPos.y -= depth.y;
+        }
+    }
 }

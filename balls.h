@@ -25,21 +25,19 @@ public:
     }
     ~Balls() {}
     bool onGameInit() override final;
-    bool onGameUpdate(uint32_t diffTicks) override final;
+    bool onGameUpdate(uint diffTicks) override final;
     void onGameDelete() override final;
+    
 
 private:
     GLProgram mProgram;
     TextureManager mTexMgr;
     Renderer mRenderer;
 
-    std::vector<Entity*> mEntities;
     Entity* mPlayer;
 
     uint mMapX, mMapY;
 
     void CameraUpdate(uint ticks);
     void buildMap();
-    void DynamicStaticCollision(Entity *eDynamic, Entity *eStatic);
-    void DynamicDynamicCollision(Entity *a, Entity *b);
 };

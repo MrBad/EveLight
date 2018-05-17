@@ -15,18 +15,12 @@ bool AABB::Intersects(const AABB& other)
     assert(other.minX < other.maxX);
     assert(other.minY < other.maxY);
 
-    return (minX < other.maxX &&
-            maxX > other.minX &&
-            minY < other.maxY &&
-            maxY > other.minY);
+    return (minX < other.maxX && maxX > other.minX && minY < other.maxY && maxY > other.minY);
 }
 
 bool AABB::FitsIn(const AABB& other)
 {
-    return (minX > other.minX &&
-            maxX <= other.maxX &&
-            minY > other.minY &&
-            maxY <= other.maxY);
+    return (minX > other.minX && maxX <= other.maxX && minY > other.minY && maxY <= other.maxY);
 }
 
 glm::vec2 AABB::GetDistance(const AABB& other)
@@ -37,4 +31,25 @@ glm::vec2 AABB::GetDistance(const AABB& other)
         other.minY + 0.5f * (other.maxY - other.minY));
 
     return otherCenter - center;
+}
+
+/**
+ * Returns a vector of the intersected area of the two AABB
+ *  Experimental.
+ */
+glm::vec2 AABB::GetIntersectionDepth(const AABB& other)
+{
+    glm::vec2 depth(GetWidth(), GetHeight()); // XXX to avoid 0 depth
+
+    if (minX < other.maxX && other.maxX < maxX)
+        depth.x = -(other.maxX - minX);
+    else if (maxX > other.minX && other.minX > minX)
+        depth.x = maxX - other.minX;
+    if (minY < other.maxY && other.maxY < maxY)
+        depth.y = -(other.maxY - minY);
+    else if (maxY > other.minY && other.minY > minY)
+        depth.y = maxY - other.minY;
+    assert(depth.x != 0.0f);
+    assert(depth.y != 0.0f);
+    return depth;
 }

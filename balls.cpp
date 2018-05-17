@@ -11,23 +11,23 @@
 #include <random>
 #include <vector>
 
-const int TSZ = 40;
+const int TSZ = 32;
 const int BSZ = 32;
-const int NUM_BALLS = 50;
+const int NUM_BALLS = 20;
 
 void Balls::buildMap()
 {
 
     std::string map = "####################\n"
                       "#                  #\n"
-                      "#   ####    ###    #\n"
-                      "#   #              #\n"
+                      "#                  #\n"
+                      "#   ####    ###### #\n"
+                      "#   #            # #\n"
+                      "#   ####         # #\n"
+                      "#   #      ####### #\n"
                       "#   ####           #\n"
-                      "#   #      ######  #\n"
-                      "#   ####           #\n"
                       "#                  #\n"
-                      "#                  #\n"
-                      "#                  #\n"
+                      "#    #         #####\n"
                       "#                  #\n"
                       "#    ##            #\n"
                       "#            ###   #\n"
@@ -59,7 +59,6 @@ void Balls::buildMap()
         }
     }
     mMapY = y;
-    std::cout << mMapX << ", " << mMapY << std::endl;
 }
 
 bool Balls::onGameInit()
@@ -90,13 +89,14 @@ bool Balls::onGameInit()
             radius, radius, mTexMgr.Get("circle")->getId());
         ball->SetColor(Color(gen(rng), gen(rng), gen(rng), 200));
         ball->SetVelocity(glm::vec2(0.05f * fgen(rng), 0.05f * fgen(rng)));
+        // ball->SetVelocity(glm::vec2(0.0001f * fgen(rng), 0.0001f * fgen(rng)));
         ball->SetType(BALL);
         mRenderer.Add(ball);
         mEntities.push_back(ball);
     }
 
     // Player
-    mPlayer = new Player(100, 100, 32, 64, mTexMgr.Get("player")->getId());
+    mPlayer = new Player(300, 300, 32, 64, mTexMgr.Get("player")->getId());
     mPlayer->SetNumFrames(6, 4);
     mPlayer->SetType(PLAYER);
     mRenderer.Add(mPlayer);
@@ -116,101 +116,18 @@ void Balls::CameraUpdate(uint ticks)
         mCamera.SetScale(mCamera.GetScale() / scaleSpeed);
 
     // Fallow the player
-    mCamera.SetPos(mPlayer->GetX(), mPlayer->GetY());
+    mCamera.SetPos(
+        mPlayer->GetX() + mPlayer->GetWidth() / 2,
+        mPlayer->GetY() + mPlayer->GetHeight() / 2);
 
     // Send camera matrix to opengl
     mCamera.SetMatrix(mProgram.getId(), "MVP");
 }
 
-void Balls::DynamicStaticCollision(Entity* eDynamic, Entity* eStatic)
-{
-    // Ball | User Brick collision
-    AABB eDynamicAABB = eDynamic->GetAABB();
-    AABB eStaticAABB = eStatic->GetAABB();
-
-    glm::vec2 distance = eDynamicAABB.GetDistance(eStaticAABB);
-    glm::vec2 newPos = eDynamic->GetPos();
-    glm::vec2 depth(0);
-    if (fabsf(distance.x) > fabsf(distance.y)) {
-        if (distance.x < 0) // left
-            newPos.x = eStatic->GetX() + eStatic->GetWidth();
-        else if (distance.x > 0) // right
-            newPos.x = eStatic->GetX() - eDynamic->GetWidth();
-        eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(-1, 1));
-    } else {
-        if (distance.y < 0) // bottom
-            newPos.y = eStatic->GetY() + eStatic->GetHeight();
-        else if (distance.y > 0) // top
-            newPos.y = eStatic->GetY() - eDynamic->GetHeight();
-        eDynamic->SetVelocity(eDynamic->GetVelocity() * glm::vec2(1, -1));
-    }
-
-    eDynamic->SetPos(newPos);
-    assert(newPos.x > 0 && newPos.x < mMapX * TSZ);
-    assert(newPos.y > 0 && newPos.y < mMapY * TSZ);
-}
-
-void Balls::DynamicDynamicCollision(Entity* a, Entity* b)
-{
-    if (a->GetType() == BALL && b->GetType() == BALL) {
-        float aRadius = a->GetWidth() / 2;
-        float bRadius = b->GetWidth() / 2;
-        float minDist = aRadius + bRadius;
-        const glm::vec2 v2Dist(
-            a->GetX() + aRadius - (b->GetX() + bRadius),
-            a->GetY() + aRadius - (b->GetY() + bRadius));
-        float dist = glm::length(v2Dist);
-        if (minDist < dist)
-            return;
-        if (!dist) // XXX bad position, avoid 0
-            return;
-
-        float depth = minDist - dist;
-        glm::vec2 v2ColDept = glm::normalize(v2Dist) * depth;
-        v2ColDept *= 0.5;
-        a->SetPos(a->GetX() + v2ColDept.x, a->GetY() + v2ColDept.y);
-        b->SetPos(b->GetX() - v2ColDept.x, b->GetY() - v2ColDept.y);
-
-        float arc = aRadius * aRadius * aRadius;
-        float brc = bRadius * bRadius * bRadius;
-        // v1New = (v1 * (vol1 - vol2) + 2 * vol2 * v2) / (vol1 + vol2) //
-        glm::vec2 aVNew = a->GetVelocity() * (arc - brc);
-        aVNew = aVNew + b->GetVelocity() * (2 * brc);
-        aVNew = aVNew / (arc + brc);
-
-        glm::vec2 bVNew = b->GetVelocity() * (brc - arc);
-        bVNew = bVNew + a->GetVelocity() * (2 * arc);
-        bVNew = bVNew / (arc + brc);
-
-        a->SetVelocity(aVNew);
-        b->SetVelocity(bVNew);
-    }
-}
-
 bool Balls::onGameUpdate(uint32_t ticks)
 {
-    for (uint i = 0; i < mEntities.size(); i++) {
+    for (uint i = 0; i < mEntities.size(); i++)
         mEntities[i]->Update(this, ticks);
-    }
-    for (uint i = 0; i < mEntities.size(); i++) {
-        Entity* a = mEntities[i];
-        for (uint j = i + 1; j < mEntities.size(); j++) {
-            Entity* b = mEntities[j];
-            if (a->isStatic() && b->isStatic())
-                continue;
-            AABB aAABB = a->GetAABB();
-            AABB bAABB = b->GetAABB();
-            if (!(aAABB.Intersects(bAABB)))
-                continue;
-            // We have a collision
-            if (!a->isStatic() && b->isStatic())
-                DynamicStaticCollision(a, b);
-            else if (a->isStatic() && !b->isStatic())
-                DynamicStaticCollision(b, a);
-            else
-                DynamicDynamicCollision(a, b);
-        }
-    }
 
     CameraUpdate(ticks);
 

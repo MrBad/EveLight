@@ -7,7 +7,7 @@
 
 class Texture {
 public:
-    Texture();
+    Texture(){}
     Texture(const std::string& name, uint width, uint height, std::vector<uint8_t>& imageBuf);
     ~Texture();
     uint getWidth() { return mWidth; }

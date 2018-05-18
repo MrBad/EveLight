@@ -49,7 +49,9 @@ glm::vec2 AABB::GetIntersectionDepth(const AABB& other)
         depth.y = -(other.maxY - minY);
     else if (maxY > other.minY && other.minY > minY)
         depth.y = maxY - other.minY;
+
     assert(depth.x != 0.0f);
     assert(depth.y != 0.0f);
+
     return depth;
 }

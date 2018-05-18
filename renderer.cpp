@@ -1,6 +1,6 @@
 #include "renderer.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 /**
  * TODO: when adding new Renderable to the queue, generate/find it's appropiate batch in the same time
@@ -72,9 +72,12 @@ void Renderer::Add(Renderable* renderable)
 bool Renderer::Delete(Renderable* renderable)
 {
     auto it = std::remove(mQueue.begin(), mQueue.end(), renderable);
-    mQueue.erase(it);
-    mDirty = true;
-    return it != mQueue.end();
+    if (it != mQueue.end()) {
+        mQueue.erase(it);
+        mDirty = true;
+        return true;
+    }
+    return false;
 }
 
 /**

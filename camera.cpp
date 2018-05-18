@@ -52,3 +52,12 @@ void Camera::SetMatrix(uint programId, const std::string& name)
         ComputeMatrix();
     glUniformMatrix4fv(pLoc, 1, GL_FALSE, &mMatrix[0][0]);
 }
+
+AABB Camera::GetAABB()
+{
+    return AABB(
+        (mPos.x - mScrDim.x / 2 / mScale),
+        (mPos.y - mScrDim.y / 2 / mScale),
+        (mPos.x + mScrDim.x / 2 / mScale),
+        (mPos.y + mScrDim.y / 2 / mScale));
+}

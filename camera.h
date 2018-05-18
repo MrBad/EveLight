@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include "aabb.h"
 
 class Camera {
 public:
@@ -18,6 +19,7 @@ public:
     float GetScale() { return mScale; }
     float GetX() { return mPos.x; }
     float GetY() { return mPos.y; }
+    AABB GetAABB();
 
 private:
     void ComputeMatrix();

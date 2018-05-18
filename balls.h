@@ -7,6 +7,7 @@
 #include "rectangle.h"
 #include "renderer.h"
 #include "sprite.h"
+#include "texter.h"
 #include "texture.h"
 #include "texture_manager.h"
 #include <GL/glew.h>
@@ -27,12 +28,12 @@ public:
     bool onGameInit() override final;
     bool onGameUpdate(uint diffTicks) override final;
     void onGameDelete() override final;
-    
 
 private:
     GLProgram mProgram;
     TextureManager mTexMgr;
     Renderer mRenderer;
+    Texter mTexter;
 
     Entity* mPlayer;
 

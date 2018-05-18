@@ -36,6 +36,7 @@ void Balls::buildMap()
 
     uint x = 0, y = 0;
     Entity* brick;
+    mMapX = 0;
 
     for (uint i = 0; i < map.size(); i++) {
         switch (map[i]) {
@@ -68,10 +69,13 @@ bool Balls::onGameInit()
     mTexMgr.Add("circle", "res/textures/circle.png");
     mTexMgr.Add("brick", "res/textures/brick.png");
     mTexMgr.Add("player", "res/textures/hero.png");
+    mTexMgr.Add("font", "res/textures/font.png");
 
     mCamera.SetPos(mWindow.getWidth() / 2, mWindow.getHeight() / 2);
 
     mRenderer.Init();
+    mTexter = Texter(&mCamera, &mRenderer, mTexMgr.Get("font"));
+    mTexter.SetNumGlyphs(16, 16);
 
     buildMap();
 
@@ -130,6 +134,13 @@ bool Balls::onGameUpdate(uint32_t ticks)
         mEntities[i]->Update(this, ticks);
 
     CameraUpdate(ticks);
+
+    mTexter.Clear();
+    mTexter.SetColor(255, 255, 255, 255);
+    mTexter.PrintAt(5, 5, "FPS: " + std::to_string(mFPS));
+    mTexter.SetColor(160, 0, 0, 255);
+    mTexter.PrintAt(5, 576, "EveLight");
+    mTexter.Flush();
 
     mRenderer.Draw();
 

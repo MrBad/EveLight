@@ -100,6 +100,14 @@ RenderBatch* Renderer::GetBatch(
     return &(*it);
 }
 
+void Renderer::Clear()
+{
+    mVertices.clear();
+    mIndexes.clear();
+    mBatches.clear();
+    mQueue.clear();
+}
+
 /**
  * Builds batches, so we can have only one vertex buffer and one index buffer, 
  * but keeping different offsets into them

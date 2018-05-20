@@ -37,7 +37,8 @@
         "type_traits": "cpp",
         "iostream": "cpp",
         "vector": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "list": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "WebKit"
 }

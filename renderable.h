@@ -1,8 +1,8 @@
 #pragma once
 
 #include "vertex.h"
-#include <vector>
 #include <GL/glew.h>
+#include <vector>
 
 enum DrawType {
     D_NONE,

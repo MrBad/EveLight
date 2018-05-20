@@ -3,24 +3,42 @@ INCLUDE=
 DFLAGS=
 LIBS=-lstdc++ -lSDL2 -lGL -lGLEW -lm
 OFLAGS=-c
-CFLAGS=-g3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
+CFLAGS=-O3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
 
-OBJECTS=main.o balls.o window.o game.o input_manager.o timer.o camera.o gl_program.o \
+EVELIB=evelib.a
+EVELIB_OBJS=window.o game.o input_manager.o timer.o camera.o gl_program.o \
+		texture.o texture_manager.o \
+		texter.o \
+		aabb.o quad_tree.o \
 		rectangle.o filled_rectangle.o \
-		lodepng/lodepng.o texture.o texture_manager.o \
-		aabb.o sprite.o multi_sprite.o renderer.o texter.o \
-		entity.o ball.o player.o
+		sprite.o multi_sprite.o renderer.o  \
+		entity.o \
+		lodepng/lodepng.o
 
-TARGET=evelight
+TARGETS=eve_push quad_test
 
-all: $(OBJECTS) Makefile
-	$(CC) $(CFLAGS) -o $(TARGET)  $(OBJECTS) $(LIBS)
+all: $(TARGETS)
+
+# quad_test exe - a QuadTree test program
+QUAD_TEST_OBJS=quad_test.o
+quad_test: $(QUAD_TEST_OBJS) $(EVELIB)
+	$(CC) $(CFLAGS) -o quad_test $(QUAD_TEST_OBJS) $(EVELIB) $(LIBS)
+
+# eve_push exe - a test program
+EVE_PUSH_OBJS=eve_push.o balls.o player.o ball.o
+eve_push: $(EVE_PUSH_OBJS) $(EVELIB)
+	$(CC) $(CFLAGS) -o eve_push $(EVE_PUSH_OBJS) $(EVELIB) $(LIBS)
 
 %.o: %.cpp Makefile *.h
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ $<
 
-run: $(TARGET)
-	./$(TARGET)
+evelib.a: $(EVELIB_OBJS)
+	$(AR) $(ARFLAGS) evelib.a $(EVELIB_OBJS)
 
+OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) 
 clean:
-	rm $(OBJECTS) $(TARGET)
+	rm $(OBJECTS) $(TARGETS)
+
+distclean:
+	rm $(EVELIB_OBJS) $(EVELIB) $(OBJECTS) $(TARGETS)
+

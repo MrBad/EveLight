@@ -163,7 +163,6 @@ void Renderer::RebuildVertices()
  */
 void Renderer::Draw()
 {
-
     if (mDirty)
         BuildBatches();
     else

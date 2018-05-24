@@ -2,19 +2,18 @@
 #include "quad_tree.h"
 #include "renderer.h"
 
-class DynRect : public FilledRectangle {
+class DynRect : public FilledRectangle, public QTEntity {
 public:
     DynRect(float x, float y, float width, float height, const Color& color)
         : FilledRectangle(x, y, width, height, color)
-        , QTObj(nullptr)
         , mVelocity(0.0f, 0.0f)
     {
     }
     ~DynRect() {}
     void SetVelocity(const glm::vec2& velocity) { mVelocity = velocity; }
     const glm::vec2& GetVelocity() const { return mVelocity; }
-
-    QTObject* QTObj;
+    // QuadTree interface implementation
+    AABB GetAABB() { return Rectangle::GetAABB(); }
 
 private:
     glm::vec2 mVelocity;
@@ -79,7 +78,7 @@ bool QuadTest::onGameInit()
         rect = new DynRect(x, y, 2, 2, color);
         rect->SetVelocity(glm::vec2((float)rand() / RAND_MAX / 1, (float)rand() / RAND_MAX / 1));
         mRects.push_back(rect);
-        rect->QTObj = mQTree.Add(rect->GetAABB(), rect);
+        mQTree.Add(rect);
     }
 
     return true;
@@ -97,7 +96,7 @@ bool QuadTest::onGameUpdate(uint dt)
         // pos.x = pos.x + mRects[i]->GetWidth() >= mWindow.getWidth() ? 1 : pos.x;
         // pos.y = pos.y + mRects[i]->GetHeight() >= mWindow.getHeight() ? 1 : pos.y;
         mRects[i]->SetPos(pos);
-        mQTree.Update(mRects[i]->QTObj, mRects[i]->GetAABB());
+        mQTree.Update(mRects[i]);
     }
 
     for (uint i = 0; i < mQuadRects.size(); i++)

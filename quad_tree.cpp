@@ -1,18 +1,6 @@
 #include "quad_tree.h"
 #include "aabb.h"
 
-// QTObject methods
-
-QTObject::QTObject(const AABB& bounds, void* data)
-    : limits(bounds)
-    , data(data)
-{
-}
-
-QTObject::~QTObject()
-{
-}
-
 // QTNode methods
 
 QTNode::QTNode(const AABB& limits, QTNode* parent)
@@ -31,17 +19,18 @@ bool QTNode::IsLeaf() const
         for (uint i = 0; i < QTNODE_NUM_CHILDREN; i++)
             assert(mChildren[i] == nullptr);
     }
+
     return mChildren[NE] == nullptr;
 }
 
 bool QTNode::HasRoom() const
 {
-    return mObjects.size() < QT_TREE_MAX_OBJECTS;
+    return mEntities.size() < QT_TREE_MAX_OBJECTS;
 }
 
 bool QTNode::IsEmpty() const
 {
-    return mObjects.size() == 0;
+    return mEntities.size() == 0;
 }
 
 bool QTNode::BrothersAreEmpty() const
@@ -49,7 +38,7 @@ bool QTNode::BrothersAreEmpty() const
     uint numChlildrendObjects = 0;
 
     for (uint i = 0; i < QTNODE_NUM_CHILDREN; i++) {
-        numChlildrendObjects += mParent->mChildren[i]->mObjects.size();
+        numChlildrendObjects += mParent->mChildren[i]->mEntities.size();
         if (!mParent->mChildren[i]->IsLeaf() || numChlildrendObjects > 0)
             return false;
     }
@@ -62,19 +51,19 @@ bool QTNode::BrothersAreEmpty() const
  * @param obj - The object
  * @return child index on success, or -1 if it cannot fit
  */
-int QTNode::GetChildIndex(QTObject* obj) const
+int QTNode::GetChildIndex(QTEntity* entity) const
 {
     assert(!IsLeaf());
 
     for (uint i = 0; i < QTNODE_NUM_CHILDREN; i++)
-        if (obj->limits.FitsIn(mChildren[i]->mLimits))
+        if (entity->GetAABB().FitsIn(mChildren[i]->mLimits))
             return i;
 
     return -1;
 }
 
 /**
- * Allocates the children nodes and their boundaries for this.
+ * Allocates the 4 children nodes and their boundaries.
  */
 void QTNode::Split()
 {
@@ -86,28 +75,28 @@ void QTNode::Split()
     mChildren[SE] = new QTNode(AABB(center.x, mLimits.minY, mLimits.maxX, center.y), this);
 }
 
-bool QTNode::Add(QTObject* obj)
+bool QTNode::Add(QTEntity* entity)
 {
     bool split, anyMoved;
     split = anyMoved = false;
-    if (!obj->limits.FitsIn(mLimits))
+    if (!entity->GetAABB().FitsIn(mLimits))
         return false;
 
     if (IsLeaf()) {
         if (HasRoom()) {
-            mObjects.push_back(obj);
-            obj->node = this;
+            mEntities.push_back(entity);
+            entity->SetQTNode(this);
             return true;
         } else {
             Split();
             split = true;
             // Move old objects down to children, if possible //
-            for (auto it = mObjects.begin(); it != mObjects.end();) {
-                QTObject* oldObj = *it;
-                int idx = GetChildIndex(oldObj);
+            for (auto it = mEntities.begin(); it != mEntities.end();) {
+                QTEntity* oldEntity = *it;
+                int idx = GetChildIndex(oldEntity);
                 if (idx > -1) {
-                    if (mChildren[idx]->Add(oldObj)) {
-                        it = mObjects.erase(it);
+                    if (mChildren[idx]->Add(oldEntity)) {
+                        it = mEntities.erase(it);
                         anyMoved = true;
                         continue;
                     }
@@ -117,9 +106,9 @@ bool QTNode::Add(QTObject* obj)
         }
     }
     // Add the new object //
-    int idx = GetChildIndex(obj);
+    int idx = GetChildIndex(entity);
     if (idx > -1) {
-        mChildren[idx]->Add(obj);
+        mChildren[idx]->Add(entity);
     } else {
         // If we splitted the node, but none of the current QTObjects
         //  moved down to children, and nor this object can fit in one of the
@@ -132,8 +121,8 @@ bool QTNode::Add(QTObject* obj)
                 mChildren[i] = nullptr;
             }
         }
-        mObjects.push_back(obj);
-        obj->node = this;
+        mEntities.push_back(entity);
+        entity->SetQTNode(this);
     }
 
     return true;
@@ -154,17 +143,16 @@ bool QTNode::DeleteUp()
     return true;
 }
 
-bool QTNode::Update(QTObject* obj, const AABB& newLimits, QTNode** root, bool expand)
+bool QTNode::Update(QTEntity* entity, QTNode** root, bool expand)
 {
     // If we still fit in this node, and this node is split
     //   check if we can fit into a child.
-    if (newLimits.FitsIn(mLimits)) {
-        obj->limits = newLimits;
+    if (entity->GetAABB().FitsIn(mLimits)) {
         if (!IsLeaf()) {
-            int idx = GetChildIndex(obj);
+            int idx = GetChildIndex(entity);
             if (idx > -1) {
-                mObjects.remove(obj);
-                return mChildren[idx]->Add(obj);
+                mEntities.remove(entity);
+                return mChildren[idx]->Add(entity);
             }
         }
         return true;
@@ -173,8 +161,8 @@ bool QTNode::Update(QTObject* obj, const AABB& newLimits, QTNode** root, bool ex
     // Climb up the tree until we found a parent that can adopt our new limits.
     bool found = false;
     QTNode* newNode;
-    for (newNode = obj->node; newNode; newNode = newNode->mParent) {
-        if (newLimits.FitsIn(newNode->mLimits)) {
+    for (newNode = entity->GetQTNode(); newNode; newNode = newNode->mParent) {
+        if (entity->GetAABB().FitsIn(newNode->mLimits)) {
             found = true;
             break;
         }
@@ -187,12 +175,11 @@ bool QTNode::Update(QTObject* obj, const AABB& newLimits, QTNode** root, bool ex
         }
         assert(root);
         std::cout << "info: Expand root on update" << std::endl;
-        newNode = *root = (*root)->Expand(newLimits);
+        newNode = *root = (*root)->Expand(entity->GetAABB());
     }
 
-    mObjects.remove(obj);
-    obj->limits = newLimits;
-    bool ret = newNode->Add(obj);
+    mEntities.remove(entity);
+    bool ret = newNode->Add(entity);
 
     if (IsLeaf() && IsEmpty() && BrothersAreEmpty())
         mParent->DeleteUp();
@@ -200,6 +187,9 @@ bool QTNode::Update(QTObject* obj, const AABB& newLimits, QTNode** root, bool ex
     return ret;
 }
 
+/**
+ * Grows the tree up (aka inverse of split) to fit newLimits
+ */
 QTNode* QTNode::Expand(const AABB& newLimits)
 {
     assert(!mParent); // should be root
@@ -263,16 +253,16 @@ QTNode* QTNode::Expand(const AABB& newLimits)
     return parent;
 }
 
-int QTNode::GetIntersections(const AABB& queryBox, std::vector<QTObject*>& outResults)
+int QTNode::GetIntersections(const AABB& queryBox, std::vector<QTEntity*>& outResults)
 {
     int numRes = 0;
     if (!mLimits.Intersects(queryBox))
         return numRes;
 
-    for (auto it = mObjects.begin(); it != mObjects.end(); it++) {
-        QTObject* obj = *it;
-        if (obj->limits.Intersects(queryBox)) {
-            outResults.push_back(obj);
+    for (auto it = mEntities.begin(); it != mEntities.end(); it++) {
+        QTEntity* entity = *it;
+        if (entity->GetAABB().Intersects(queryBox)) {
+            outResults.push_back(entity);
             numRes++;
         }
     }
@@ -291,18 +281,33 @@ QTNode::~QTNode()
         for (int i = 0; i < QTNODE_NUM_CHILDREN; i++)
             delete mChildren[i];
 
-    for (auto it = mObjects.begin(); it != mObjects.end(); it++)
+#if 0
+    for (auto it = mEntities.begin(); it != mEntities.end(); it++)
         delete *it;
+#endif
 }
 
-void QTNode::Traverse(std::function<bool(QTNode*)> cbFunc)
+void QTNode::Traverse(std::function<bool(QTNode*)> func)
 {
+    if (!func(this))
+        return;
+
     for (int i = 0; i < QTNODE_NUM_CHILDREN; i++) {
         if (mChildren[i])
-            mChildren[i]->Traverse(cbFunc);
+            mChildren[i]->Traverse(func);
     }
+}
 
-    cbFunc(this);
+void QTNode::TraverseEntities(std::function<bool(QTEntity*)> func)
+{
+    for (auto it = mEntities.begin(); it != mEntities.end(); it++)
+        if (!func(*it))
+            return;
+
+    for (int i = 0; i < QTNODE_NUM_CHILDREN; i++) {
+        if (mChildren[i])
+            mChildren[i]->TraverseEntities(func);
+    }
 }
 
 // QuadTree methods
@@ -321,34 +326,33 @@ void QuadTree::Init(const AABB& limits, bool expandable)
     mExpandable = expandable;
 }
 
-QTObject* QuadTree::Add(const AABB& limits, void* data)
+bool QuadTree::Add(QTEntity* entity)
 {
-    if (!limits.FitsIn(mRoot->mLimits)) {
+    if (!entity->GetAABB().FitsIn(mRoot->mLimits)) {
         if (!mExpandable) {
             std::cerr
                 << "Requested limits out of tree max range. Will not expand root!"
                 << std::endl;
-            return nullptr;
+            return false;
         }
-        mRoot = mRoot->Expand(limits);
+        mRoot = mRoot->Expand(entity->GetAABB());
         printf("Expanded Root\n");
     }
-    QTObject* obj = new QTObject(limits, data);
-    if (!mRoot->Add(obj)) {
-        delete obj;
-        return nullptr;
+
+    if (!mRoot->Add(entity)) {
+        return false;
     }
     mItems++;
 
-    return obj;
+    return true;
 }
 
-bool QuadTree::Update(QTObject* obj, const AABB& newLimits)
+bool QuadTree::Update(QTEntity* entity)
 {
-    return obj->node->Update(obj, newLimits, &mRoot, mExpandable);
+    return entity->GetQTNode()->Update(entity, &mRoot, mExpandable);
 }
 
-int QuadTree::GetIntersections(const AABB& queryBox, std::vector<QTObject*>& outResults)
+int QuadTree::GetIntersections(const AABB& queryBox, std::vector<QTEntity*>& outResults)
 {
     return mRoot->GetIntersections(queryBox, outResults);
 }
@@ -358,10 +362,36 @@ QuadTree::~QuadTree()
     delete mRoot;
 }
 
-void QuadTree::Traverse(std::function<bool(QTNode*)> cbFunc)
+void QuadTree::Traverse(std::function<bool(QTNode*)> func)
 {
-    return mRoot->Traverse(cbFunc);
+    return mRoot->Traverse(func);
 }
+
+void QuadTree::TraverseEntities(std::function<bool(QTEntity*)> func)
+{
+    return mRoot->TraverseEntities(func);
+}
+
+/**
+ * Some tests, not part of the tree functionality
+ */
+class StrEnt : public QTEntity {
+public:
+    StrEnt(const AABB& aabb, const std::string& str)
+        : mStr(str)
+        , mAABB(aabb)
+    {
+    }
+    ~StrEnt() {}
+    AABB GetAABB() { return mAABB; }
+
+    void SetAABB(const AABB& aabb) { mAABB = aabb; }
+    std::string mStr;
+
+private:
+    AABB mAABB;
+    QTNode* mQTNode;
+};
 
 bool QuadTree::Test()
 {
@@ -376,63 +406,85 @@ bool QuadTree::Test()
         assert(tree.mRoot->mChildren[i] == nullptr);
 
     AABB box(3, 5, 5, 7);
-    assert(tree.Add(box, (void*)"First Object generic data"));
-    assert(tree.mRoot->mObjects.size() == 1);
+    StrEnt* strEnt;
+    strEnt = new StrEnt(box, "First Object generic data");
+    assert(tree.Add(strEnt));
+    assert(tree.mRoot->mEntities.size() == 1);
     assert(tree.mRoot->IsLeaf());
-    assert(tree.mRoot->mObjects.back()->limits.minX == 3);
-    assert(tree.mRoot->mObjects.back()->limits.maxX == 5);
+    assert(tree.mRoot->mEntities.back()->GetAABB().minX == 3);
+    assert(tree.mRoot->mEntities.back()->GetAABB().maxX == 5);
 
     box = AABB(-5, 2, -3, 4);
     std::string str2("Second Object");
-    assert(tree.Add(box, (void*)str2.c_str()));
-    assert(tree.mRoot->mObjects.size() == 2);
+    strEnt = new StrEnt(box, str2);
+    assert(tree.Add(strEnt));
+    assert(tree.mRoot->mEntities.size() == 2);
     assert(tree.mRoot->IsLeaf()); // still leaf for 2 nodes
-    assert(tree.mRoot->mObjects.back()->limits.minX == -5);
-    assert(tree.mRoot->mObjects.back()->limits.maxX == -3);
-    assert(str2.compare((char*)tree.mRoot->mObjects.back()->data) == 0);
+    assert(tree.mRoot->mEntities.back()->GetAABB().minX == -5);
+    assert(tree.mRoot->mEntities.back()->GetAABB().maxX == -3);
+    assert(str2.compare(((StrEnt*)tree.mRoot->mEntities.back())->mStr) == 0);
 
     // Here the node should split //
     box = AABB(-5, -7, -3, -5);
-    assert(tree.Add(box, (void*)"Third Object"));
-    assert(tree.mRoot->mObjects.size() == 0);
+    strEnt = new StrEnt(box, "Third Object");
+    assert(tree.Add(strEnt));
+    assert(tree.mRoot->mEntities.size() == 0);
     assert(tree.mRoot->IsEmpty());
     assert(!tree.mRoot->IsLeaf());
-    assert(tree.mRoot->mChildren[NE]->mObjects.size() == 1);
-    assert(tree.mRoot->mChildren[NW]->mObjects.size() == 1);
-    assert(tree.mRoot->mChildren[SW]->mObjects.size() == 1);
-    assert(tree.mRoot->mChildren[SE]->mObjects.size() == 0);
+    assert(tree.mRoot->mChildren[NE]->mEntities.size() == 1);
+    assert(tree.mRoot->mChildren[NW]->mEntities.size() == 1);
+    assert(tree.mRoot->mChildren[SW]->mEntities.size() == 1);
+    assert(tree.mRoot->mChildren[SE]->mEntities.size() == 0);
 
     box = AABB(2, 4, 4, 6);
-    assert(tree.Add(box, (void*)"Forth Object"));
+    strEnt = new StrEnt(box, "Forth Object");
+    assert(tree.Add(strEnt));
 
     box = AABB(1, 1, 3, 3);
-    assert(tree.Add(box, (void*)"Fifth Object"));
+    strEnt = new StrEnt(box, "Fifth Object");
+    assert(tree.Add(strEnt));
 
     box = AABB(6, 6, 8, 8);
-    assert(tree.Add(box, (void*)"Sixth Object"));
+    strEnt = new StrEnt(box, "Sixth Object");
+    assert(tree.Add(strEnt));
 
-    std::vector<QTObject*> results;
+    std::vector<QTEntity*> results;
     AABB queryBox = AABB(0, 0, 10, 10);
     int numRes = tree.GetIntersections(queryBox, results);
     assert(numRes == 4);
     assert(results.size() == 4);
     for (uint i = 0; i < results.size(); i++)
-        assert(results[i]->limits.Intersects(queryBox));
+        assert(results[i]->GetAABB().Intersects(queryBox));
+
+    auto delEntity = [](QTEntity* entity) {
+        delete entity;
+        return true;
+    };
+    tree.TraverseEntities(delEntity);
 
     QuadTree t2;
     t2.Init(AABB(0, 0, 10, 10), false);
     box = AABB(2, 2, 3, 3);
-    t2.Add(box, (void*)"Rect 1");
+    strEnt = new StrEnt(box, "Rect 1");
+    t2.Add(strEnt);
     box = AABB(3, 3, 4, 4);
-    QTObject* obj1 = t2.Add(box, (void*)"Rect 2");
+    StrEnt* obj1 = new StrEnt(box, "Rect 2");
+    t2.Add(obj1);
     box = AABB(4, 4, 5, 5);
-    QTObject* obj2 = t2.Add(box, (void*)"Rect 3");
+    StrEnt* obj2 = new StrEnt(box, "Rect 3");
+    t2.Add(obj2);
 
     box = AABB(2, 2, 4, 4);
-    t2.Update(obj1, box);
-    assert(t2.mRoot->mChildren[2]->mObjects.size() == 2);
-    t2.Update(obj2, box);
-    assert(t2.mRoot->mChildren[2]->mObjects.size() == 3);
+    obj1->SetAABB(box);
+    t2.Update(obj1);
+
+    assert(t2.mRoot->mChildren[2]->mEntities.size() == 2);
+    obj2->SetAABB(box);
+    t2.Update(obj2);
+
+    assert(t2.mRoot->mChildren[2]->mEntities.size() == 3);
+
+    t2.TraverseEntities(delEntity);
 
     return true;
 }

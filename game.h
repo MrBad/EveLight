@@ -32,5 +32,5 @@ protected:
     uint mFPSTicks;
     uint mFPSNumFrames;
     uint mFPS;
-    std::vector<Entity*> mEntities;
+    std::vector<Entity*> mEntities; // XXX
 };

@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/quad_test",
+            "program": "${workspaceFolder}/quad_query",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

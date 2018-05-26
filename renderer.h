@@ -34,6 +34,7 @@ public:
     void Init();
     void Add(Renderable* renderable);
     bool Delete(Renderable* renderable);
+    void Clear();
     void Draw();
     void BuildBatches();
     void RebuildVertices();

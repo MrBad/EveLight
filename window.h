@@ -14,8 +14,8 @@ public:
     bool setSwapInterval(int interval);
     void Clear();
     SDL_Window* getSDLWindow() { return mWindow; }
-    int getWidth() { return mWidth; }
-    int getHeight() { return mHeight; }
+    int GetWidth() { return mWidth; }
+    int GetHeight() { return mHeight; }
     void Update();
     void setTitle(const string& title);
     void setSize(int width, int height);

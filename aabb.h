@@ -7,9 +7,9 @@ struct AABB {
 
     AABB(float x1, float y1, float x2, float y2);
     bool Intersects(const AABB& other);
-    bool FitsIn(const AABB& other);
+    bool FitsIn(const AABB& other) const;
     /* Gets the distance between center of rectangles. */
-    glm::vec2 GetDistance(const AABB& other);
+    glm::vec2 GetDistance(const AABB& other) const;
     float GetWidth() { return maxX - minX; }
     float GetHeight() { return maxY - minY; }
     glm::vec2 GetMin() { return glm::vec2(minX, minY); }

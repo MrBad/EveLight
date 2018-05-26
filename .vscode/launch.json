@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/evelight",
+            "program": "${workspaceFolder}/quad_query",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

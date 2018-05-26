@@ -24,9 +24,10 @@ void Texter::SetNumGlyphs(uint numXGlyphs, uint numYGlyphs)
 
 void Texter::Clear()
 {
-    // XXX Not the fastest way!!!
+    // XXX Not the fastest. Better way is to use a separate renderer.
     for (uint i = 0; i < mGlyphs.size(); i++)
         mRenderer->Delete(&mGlyphs[i]);
+
     mGlyphs.clear();
 }
 

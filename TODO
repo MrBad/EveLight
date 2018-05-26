@@ -1,0 +1,24 @@
+- consolidate Entity class/system:
+    - use QuadTree for it.
+    - Entity should not extend MultiSprite. Probably it should not know
+        about how it is drawn on screen.
+        It should CONTAIN something like Renderable class.
+
+- QuadTree can be more generic; instead of constrain on using AABB/GetAABB
+    in QTEntity interface, I can rewrite the QTEntity to have few methods like:
+        QTEntity::FitsIn, QTEntity::Intersect, QTEntity::GetBoundary
+        (?! for growing up the tree). 
+        This way, we can use points and lines inside it.
+
++ Window class has some not consistent methods - getWidth(), getHeight().
+    It should probably be GetWidth(), GetHeight().
+
+- move EveLight library in a separate folder and add a namespace for it. 
+    namespace evl can be a nice short name.
+
+- use FreeType fonts for Texter and not a png texture.
+
+- how about running it on Windows... Yeah...
+
+- write documentation for the library. Move the programs that is using EveLight
+    in a demo folder.

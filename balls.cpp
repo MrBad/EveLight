@@ -5,15 +5,16 @@
 #include "aabb.h"
 #include "ball.h"
 #include "player.h"
+#include "quad_tree.h"
 #include "texture.h"
 #include <glm/glm.hpp>
 #include <iostream>
 #include <random>
 #include <vector>
 
-const int TSZ = 32;
+const int TSZ = 128;
 const int BSZ = 32;
-const int NUM_BALLS = 20;
+const int NUM_BALLS = 400;
 
 void Balls::buildMap()
 {
@@ -71,7 +72,7 @@ bool Balls::onGameInit()
     mTexMgr.Add("player", "res/textures/hero.png");
     mTexMgr.Add("font", "res/textures/font.png");
 
-    mCamera.SetPos(mWindow.getWidth() / 2, mWindow.getHeight() / 2);
+    mCamera.SetPos(mWindow.GetWidth() / 2, mWindow.GetHeight() / 2);
 
     mRenderer.Init();
     mTexter = Texter(&mCamera, &mRenderer, mTexMgr.Get("font"));
@@ -136,12 +137,10 @@ bool Balls::onGameUpdate(uint32_t ticks)
     CameraUpdate(ticks);
 
     mTexter.Clear();
-    mTexter.SetColor(255, 255, 255, 255);
-    mTexter.PrintAt(5, 5, "FPS: " + std::to_string(mFPS));
-    mTexter.SetColor(160, 0, 0, 255);
-    mTexter.PrintAt(5, 576, "EveLight");
-    mTexter.Flush();
+    mTexter.SetColor(128, 200, 128, 255);
+    mTexter.PrintAt(0, 0, "FPS: " + std::to_string(mFPS));
 
+    mTexter.Flush();
     mRenderer.Draw();
 
     // cout << mFPS << endl;

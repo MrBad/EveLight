@@ -18,12 +18,12 @@ bool AABB::Intersects(const AABB& other)
     return (minX < other.maxX && maxX > other.minX && minY < other.maxY && maxY > other.minY);
 }
 
-bool AABB::FitsIn(const AABB& other)
+bool AABB::FitsIn(const AABB& other) const
 {
     return (minX > other.minX && maxX <= other.maxX && minY > other.minY && maxY <= other.maxY);
 }
 
-glm::vec2 AABB::GetDistance(const AABB& other)
+glm::vec2 AABB::GetDistance(const AABB& other) const
 {
     glm::vec2 center(minX + 0.5f * (maxX - minX), minY + 0.5f * (maxY - minY));
     glm::vec2 otherCenter(

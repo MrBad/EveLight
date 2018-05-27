@@ -1,8 +1,10 @@
-- consolidate Entity class/system:
+~ consolidate Entity class/system:
     - use QuadTree for it.
-    - Entity should not extend MultiSprite. Probably it should not know
+    + Entity should not extend MultiSprite. Probably it should not know
         about how it is drawn on screen.
         It should CONTAIN something like Renderable class.
+
+- Renderer should Add Renderable Entity?
 
 - QuadTree can be more generic; instead of constrain on using AABB/GetAABB
     in QTEntity interface, I can rewrite the QTEntity to have few methods like:

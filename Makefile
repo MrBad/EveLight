@@ -42,7 +42,7 @@ eve_push: $(EVE_PUSH_OBJS) $(EVELIB)
 evelib.a: $(EVELIB_OBJS)
 	$(AR) $(ARFLAGS) evelib.a $(EVELIB_OBJS)
 
-OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) 
+OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) q1.o
 clean:
 	rm $(OBJECTS) $(TARGETS)
 

@@ -1,4 +1,6 @@
+#include "filled_rectangle.h"
 #include "game.h"
+#include "gl_program.h"
 #include "quad_tree.h"
 #include "renderer.h"
 
@@ -9,7 +11,6 @@ public:
         , mVelocity(0.0f, 0.0f)
     {
     }
-    ~DynRect() {}
     void SetVelocity(const glm::vec2& velocity) { mVelocity = velocity; }
     const glm::vec2& GetVelocity() const { return mVelocity; }
     // QuadTree interface implementation
@@ -69,8 +70,10 @@ bool QuadTest::onGameUpdate(uint dt)
     for (uint i = 0; i < mRects.size(); i++) {
         glm::vec2 pos = mRects[i]->GetPos();
         pos += (float)dt * mRects[i]->GetVelocity();
-        // pos.x = pos.x + mRects[i]->GetWidth() >= mWindow.getWidth() ? 1 : pos.x;
-        // pos.y = pos.y + mRects[i]->GetHeight() >= mWindow.getHeight() ? 1 : pos.y;
+#if 0
+        pos.x = pos.x + mRects[i]->GetWidth() >= mWindow.GetWidth() ? 1 : pos.x;
+        pos.y = pos.y + mRects[i]->GetHeight() >= mWindow.GetHeight() ? 1 : pos.y;
+#endif
         mRects[i]->SetPos(pos);
         mQTree.Update(mRects[i]);
     }

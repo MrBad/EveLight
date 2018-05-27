@@ -1,6 +1,6 @@
 #include "balls.h"
-#include <iostream>
 #include "quad_tree.h"
+#include <iostream>
 
 int main()
 {

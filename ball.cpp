@@ -1,10 +1,10 @@
 #include "ball.h"
 #include "balls.h"
 
-Ball::Ball(float x, float y, float width, float height, uint texId)
-    : Entity(x, y, width, height, texId)
+void Ball::SetPos(const glm::vec2& pos)
 {
-    SetStatic(false);
+    mPos = pos;
+    mSprite.SetPos(pos);
 }
 
 void Ball::Update(Game* game, uint ticks)
@@ -18,7 +18,7 @@ void Ball::Update(Game* game, uint ticks)
 
 bool Ball::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
 {
-    (void) ticks;
+    (void)ticks;
     bool collided = false;
     const std::vector<Entity*> entities = game->GetEntities();
     for (uint i = 0; i < entities.size(); i++) {
@@ -31,7 +31,7 @@ bool Ball::CheckCollisions(Game* game, uint ticks, glm::vec2& newPos)
                 BrickCollision(newPos, entities[i]);
                 break;
             case BALL:
-                BallCollision(newPos, entities[i]);
+                BallCollision(newPos, (Ball*)entities[i]);
                 break;
             }
         }
@@ -70,15 +70,15 @@ void Ball::BrickCollision(glm::vec2& newPos, Entity* brick)
     }
 }
 
-void Ball::BallCollision(glm::vec2& newPos, Entity* other)
+void Ball::BallCollision(glm::vec2& newPos, Ball* other)
 {
-    float aRadius = GetRadius();
-    float bRadius = other->GetWidth() / 2;
-    float minDist = aRadius + bRadius;
+    float oRadius = other->GetRadius();
+    float minDist = mRadius + oRadius;
     const glm::vec2 v2Dist(
-        mX + aRadius - (other->GetX() + bRadius),
-        mY + aRadius - (other->GetY() + bRadius));
+        mPos.x + mRadius - (other->GetPos().x + oRadius),
+        mPos.y + mRadius - (other->GetPos().y + oRadius));
     float dist = glm::length(v2Dist);
+
     if (minDist < dist)
         return;
     if (!dist) // XXX bad position, avoid 0
@@ -88,10 +88,10 @@ void Ball::BallCollision(glm::vec2& newPos, Entity* other)
     glm::vec2 v2ColDept = glm::normalize(v2Dist) * depth;
     v2ColDept *= 0.5;
     newPos += v2ColDept;
-    other->SetPos(other->GetX() - v2ColDept.x, other->GetY() - v2ColDept.y);
+    other->SetPos(other->GetPos() - v2ColDept);
 
-    float arc = aRadius * aRadius * aRadius;
-    float brc = bRadius * bRadius * bRadius;
+    float arc = mRadius * mRadius * mRadius;
+    float brc = oRadius * oRadius * oRadius;
     // v1New = (v1 * (vol1 - vol2) + 2 * vol2 * v2) / (vol1 + vol2) //
     glm::vec2 aVNew = mVelocity * (arc - brc);
     aVNew = aVNew + other->GetVelocity() * (2 * brc);

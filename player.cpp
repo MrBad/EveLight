@@ -4,11 +4,19 @@
 #include "game.h"
 
 Player::Player(float x, float y, float width, float height, uint texId)
-    : Entity(x, y, width, height, texId)
+    : Entity(x, y, width, height)
     , mAnimSpeed(0.01f)
-    , mSpeed(0.15f)
+    , mSpeed(0.3f)
+    , mSprite(width, height, texId)
 {
-    SetStatic(false);
+    mType = PLAYER;
+    mSprite.SetPos(mPos);
+}
+
+void Player::SetPos(const glm::vec2& pos)
+{
+    mPos = pos;
+    mSprite.SetPos(pos);
 }
 
 void Player::Update(Game* game, uint ticks)
@@ -62,7 +70,7 @@ void Player::Update(Game* game, uint ticks)
     if (frameX > 5.0f)
         frameX = 0;
 
-    SetFrame(floor(frameX) + 1, pFace);
+    mSprite.SetFrame(floor(frameX) + 1, pFace);
     // update velocity if is not 0 (so we keep track of previous one)
     if (velocity.x || velocity.y)
         mVelocity = velocity;
@@ -131,7 +139,7 @@ void Player::BallCollision(Game* game, uint ticks, glm::vec2& newPos, Entity* ba
         if (fabs(depth.x) < fabs(depth.y)) {
             newPos.x -= depth.x;
         } else {
-           newPos.y -= depth.y;
+            newPos.y -= depth.y;
         }
     }
 }

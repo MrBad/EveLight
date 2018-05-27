@@ -1,8 +1,10 @@
 #pragma once
 
-#include "entity.h"
+#include "aabb.h"
 #include <functional>
+#include <iostream>
 #include <list>
+#include <vector>
 
 enum {
     NE,

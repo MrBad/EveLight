@@ -17,7 +17,6 @@ struct Renderable {
     std::vector<int> mIndexes;
     DrawType mDrawType;
     GLuint textureId;
-    int mType;
     Renderable()
         : mDrawType(D_NONE)
         , textureId(0){};

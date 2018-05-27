@@ -1,5 +1,7 @@
 
+#include "filled_rectangle.h"
 #include "game.h"
+#include "gl_program.h"
 #include "quad_tree.h"
 #include "renderer.h"
 #include <string>

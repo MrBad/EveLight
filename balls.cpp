@@ -4,7 +4,6 @@
 #include "balls.h"
 #include "aabb.h"
 #include "ball.h"
-#include "player.h"
 #include "quad_tree.h"
 #include "texture.h"
 #include <glm/glm.hpp>
@@ -14,11 +13,25 @@
 
 const int TSZ = 128;
 const int BSZ = 32;
-const int NUM_BALLS = 400;
+const int NUM_BALLS = 200;
+
+class Brick : public Entity {
+public:
+    Brick(float x, float y, float width, float height, uint texId)
+        : Entity(x, y, width, height)
+        , mSprite(width, height, texId)
+    {
+        mType = BRICK;
+        mSprite.SetPos(mPos);
+    }
+    Renderable* GetRenderable() { return &mSprite; }
+
+private:
+    Sprite mSprite;
+};
 
 void Balls::buildMap()
 {
-
     std::string map = "####################\n"
                       "#                  #\n"
                       "#                  #\n"
@@ -36,15 +49,14 @@ void Balls::buildMap()
                       "####################\n";
 
     uint x = 0, y = 0;
-    Entity* brick;
     mMapX = 0;
+    Brick* brick;
 
     for (uint i = 0; i < map.size(); i++) {
         switch (map[i]) {
         case '#':
-            brick = new Entity(x * TSZ, y * TSZ, TSZ, TSZ, mTexMgr.Get("brick")->getId());
-            brick->SetType(BRICK);
-            mRenderer.Add(brick);
+            brick = new Brick(x * TSZ, y * TSZ, TSZ, TSZ, mTexMgr.Get("brick")->getId());
+            mRenderer.Add(brick->GetRenderable());
             mEntities.push_back(brick);
             x++;
             break;
@@ -89,22 +101,21 @@ bool Balls::onGameInit()
         float radius = BSZ / 2 + gen(rng) % BSZ / 2;
 
         Ball* ball = new Ball(
-            fgen(rng) + (1 + gen(rng) % (mMapX - 2)) * TSZ,
-            fgen(rng) + (1 + gen(rng) % (mMapY - 2)) * TSZ,
-            radius, radius, mTexMgr.Get("circle")->getId());
+            fgen(rng) + (1 + gen(rng) % (mMapX - 2)) * TSZ + radius,
+            fgen(rng) + (1 + gen(rng) % (mMapY - 2)) * TSZ + radius,
+            radius, mTexMgr.Get("circle")->getId());
+
         ball->SetColor(Color(gen(rng), gen(rng), gen(rng), 200));
         ball->SetVelocity(glm::vec2(0.05f * fgen(rng), 0.05f * fgen(rng)));
         // ball->SetVelocity(glm::vec2(0.0001f * fgen(rng), 0.0001f * fgen(rng)));
-        ball->SetType(BALL);
-        mRenderer.Add(ball);
-        mEntities.push_back(ball);
+        mRenderer.Add(ball->GetRenderable());
+        mEntities.push_back((Entity*)ball);
     }
 
     // Player
     mPlayer = new Player(300, 300, 32, 64, mTexMgr.Get("player")->getId());
-    mPlayer->SetNumFrames(6, 4);
-    mPlayer->SetType(PLAYER);
-    mRenderer.Add(mPlayer);
+    mPlayer->SetSpriteNumFrames(6, 4);
+    mRenderer.Add(mPlayer->GetRenderable());
     mEntities.push_back(mPlayer);
 
     return true;
@@ -120,10 +131,10 @@ void Balls::CameraUpdate(uint ticks)
     else if (mInMgr.isKeyPressed(K_e))
         mCamera.SetScale(mCamera.GetScale() / scaleSpeed);
 
-    // Fallow the player
+    // Follow the player
     mCamera.SetPos(
-        mPlayer->GetX() + mPlayer->GetWidth() / 2,
-        mPlayer->GetY() + mPlayer->GetHeight() / 2);
+        mPlayer->GetPos().x + mPlayer->GetWidth() / 2,
+        mPlayer->GetPos().y + mPlayer->GetHeight() / 2);
 
     // Send camera matrix to opengl
     mCamera.SetMatrix(mProgram.getId(), "MVP");

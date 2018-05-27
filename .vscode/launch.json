@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/quad_query",
+            "program": "${workspaceFolder}/eve_push",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

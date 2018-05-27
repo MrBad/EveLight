@@ -4,6 +4,7 @@
 #include "game.h"
 #include "gl_program.h"
 #include "multi_sprite.h"
+#include "player.h"
 #include "rectangle.h"
 #include "renderer.h"
 #include "sprite.h"
@@ -13,6 +14,7 @@
 #include <GL/glew.h>
 
 enum EntityType {
+    NO_ENTITY,
     BALL,
     BRICK,
     PLAYER
@@ -35,7 +37,7 @@ private:
     Renderer mRenderer;
     Texter mTexter;
 
-    Entity* mPlayer;
+    Player* mPlayer;
 
     uint mMapX, mMapY;
 

@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/eve_push",
+            "program": "${workspaceFolder}/gol",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

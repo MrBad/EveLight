@@ -1,4 +1,5 @@
 // DOC: http://sunandblackcat.com/tipFullView.php?l=eng&topicid=18&topic=OpenGL-VAO-VBO-EBO
+// somehow deprecated, use renderer.
 #include "mesh.h"
 #include <iostream>
 

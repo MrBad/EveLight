@@ -6,6 +6,7 @@ MultiSprite::MultiSprite(float x, float y, float width, float height, const Colo
     , mNumY(1)
 {
 }
+
 MultiSprite::MultiSprite(float width, float height, uint texId)
     : Sprite(width, height, texId)
     , mNumX(1)

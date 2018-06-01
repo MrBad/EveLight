@@ -10,14 +10,19 @@ EVELIB_OBJS=window.o game.o input_manager.o timer.o camera.o gl_program.o \
 		texture.o texture_manager.o \
 		renderer.o texter.o \
 		aabb.o quad_tree.o \
-		rectangle.o filled_rectangle.o sprite.o multi_sprite.o \
+		rectangle.o filled_rectangle.o sprite.o multi_sprite.o grid.o \
 		entity.o \
 		lodepng/lodepng.o
 
-TARGETS=eve_push quad_test quad_query q1
+TARGETS=eve_push quad_test quad_query q1 gol
 
 all: $(TARGETS)
 
+# game of life demo
+gol: $(EVELIB) gol.o
+	$(CC) $(CFLAGS) -o gol gol.o $(EVELIB) $(LIBS)
+
+# quad internal test
 q1: $(EVELIB) q1.o
 	$(CC) $(CFLAGS) -o q1 q1.o $(EVELIB) $(LIBS)
 
@@ -42,7 +47,7 @@ eve_push: $(EVE_PUSH_OBJS) $(EVELIB)
 evelib.a: $(EVELIB_OBJS)
 	$(AR) $(ARFLAGS) evelib.a $(EVELIB_OBJS)
 
-OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) q1.o
+OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) q1.o gol.o
 clean:
 	rm $(OBJECTS) $(TARGETS)
 

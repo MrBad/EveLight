@@ -10,5 +10,6 @@ FilledRectangle::FilledRectangle(float x, float y, float width, float height, co
     mWidth = width;
     mHeight = height;
     mColor = color;
+
     BuildVertices();
 }

@@ -4,7 +4,7 @@ INCLUDE=
 DFLAGS=
 LIBS=-lstdc++ -lSDL2 -lGL -lGLEW -lm
 OFLAGS=-c
-CFLAGS=-g3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
+CFLAGS=-O3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
 EVELIB=evelib.a
 EVELIB_OBJS=window.o game.o input_manager.o timer.o camera.o gl_program.o \
 		texture.o texture_manager.o \
@@ -20,7 +20,7 @@ all: $(TARGETS)
 
 # game of life demo
 gol: $(EVELIB) gol.o
-	$(CC) $(CFLAGS) -o gol gol.o $(EVELIB) $(LIBS)
+	$(CC) $(CFLAGS) -o gol gol.o $(EVELIB) $(LIBS) -lpthread
 
 # quad internal test
 q1: $(EVELIB) q1.o

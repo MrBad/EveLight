@@ -38,7 +38,10 @@
         "iostream": "cpp",
         "vector": "cpp",
         "random": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "strstream": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "WebKit"
 }

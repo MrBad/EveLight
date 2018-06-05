@@ -22,6 +22,12 @@ void Camera::SetPos(float x, float y)
     mDirty = true;
 }
 
+void Camera::SetPos(const glm::vec2& pos)
+{
+    mPos = pos;
+    mDirty = true;
+}
+
 void Camera::ComputeMatrix()
 {
     glm::mat4 Projection = glm::ortho(0.0f, mScrDim.x, 0.0f, mScrDim.y, -1.0f, 1.0f);

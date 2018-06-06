@@ -3,13 +3,15 @@
  * DOCS: https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
  * TODO(vio): use this structure to split computing on several network nodes.
  */
-#include "filled_rectangle.h"
-#include "game.h"
-#include "gl_program.h"
-#include "grid.h"
-#include "renderer.h"
+#include "evelight/filled_rectangle.h"
+#include "evelight/game.h"
+#include "evelight/gl_program.h"
+#include "evelight/grid.h"
+#include "evelight/renderer.h"
 #include <iostream>
 #include <thread>
+
+using namespace evl;
 
 #define NUM_WORKERS 4
 

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "entity.h"
-#include "multi_sprite.h"
+#include "evelight/entity.h"
+#include "evelight/multi_sprite.h"
 #include <glm/glm.hpp>
+
+using namespace evl;
 
 class Player : public Entity {
 public:

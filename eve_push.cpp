@@ -1,5 +1,5 @@
 #include "balls.h"
-#include "quad_tree.h"
+#include "evelight/quad_tree.h"
 #include <iostream>
 
 int main()

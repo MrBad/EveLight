@@ -2,10 +2,10 @@
  * A small test game
  */
 #include "balls.h"
-#include "aabb.h"
+#include "evelight/aabb.h"
 #include "ball.h"
-#include "quad_tree.h"
-#include "texture.h"
+#include "evelight/quad_tree.h"
+#include "evelight/texture.h"
 #include <glm/glm.hpp>
 #include <iostream>
 #include <random>
@@ -64,7 +64,7 @@ void Balls::buildMap()
             x++;
             break;
         case '\n':
-            mMapX = max(mMapX, x);
+            mMapX = std::max(mMapX, x);
             x = 0;
             y++;
             break;

@@ -5,14 +5,7 @@ DFLAGS=
 LIBS=-lstdc++ -lSDL2 -lGL -lGLEW -lm
 OFLAGS=-c
 CFLAGS=-O3 -Wall -Wextra -std=c++11 -pedantic-errors $(INCLUDE) $(DFLAGS)
-EVELIB=evelib.a
-EVELIB_OBJS=window.o game.o input_manager.o timer.o camera.o gl_program.o \
-		texture.o texture_manager.o \
-		renderer.o texter.o \
-		aabb.o quad_tree.o \
-		rectangle.o filled_rectangle.o sprite.o multi_sprite.o grid.o \
-		entity.o \
-		lodepng/lodepng.o
+EVELIB=evelight/evelib.a
 
 TARGETS=eve_push quad_test quad_query q1 gol
 
@@ -44,13 +37,14 @@ eve_push: $(EVE_PUSH_OBJS) $(EVELIB)
 %.o: %.cpp Makefile *.h
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ $<
 
-evelib.a: $(EVELIB_OBJS)
-	$(AR) $(ARFLAGS) evelib.a $(EVELIB_OBJS)
+evelight/evelib.a:
+	make -C evelight
 
-OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) q1.o gol.o
+OBJECTS=$(QUAD_TEST_OBJS) $(EVE_PUSH_OBJS) q1.o gol.o quad_query.o
 clean:
 	rm $(OBJECTS) $(TARGETS)
 
 distclean:
-	rm $(EVELIB_OBJS) $(EVELIB) $(OBJECTS) $(TARGETS)
+	rm $(OBJECTS) $(TARGETS) || true
+	make -C evelight clean
 

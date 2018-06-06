@@ -1,10 +1,12 @@
 
-#include "filled_rectangle.h"
-#include "game.h"
-#include "gl_program.h"
-#include "quad_tree.h"
-#include "renderer.h"
+#include "evelight/filled_rectangle.h"
+#include "evelight/game.h"
+#include "evelight/gl_program.h"
+#include "evelight/quad_tree.h"
+#include "evelight/renderer.h"
 #include <string>
+
+using namespace evl;
 
 class QTRect : public FilledRectangle, public QTEntity {
 public:

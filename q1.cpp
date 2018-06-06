@@ -1,4 +1,6 @@
-#include "quad_tree.h"
+#include "evelight/quad_tree.h"
+
+using namespace evl;
 
 int main()
 {

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "balls.h"
-#include "entity.h"
-#include "sprite.h"
+#include "evelight/entity.h"
+#include "evelight/sprite.h"
 #include <glm/glm.hpp>
+
+using namespace evl;
 
 class Ball : public Entity {
 public:

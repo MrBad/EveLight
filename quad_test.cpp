@@ -1,8 +1,10 @@
-#include "filled_rectangle.h"
-#include "game.h"
-#include "gl_program.h"
-#include "quad_tree.h"
-#include "renderer.h"
+#include "evelight/filled_rectangle.h"
+#include "evelight/game.h"
+#include "evelight/gl_program.h"
+#include "evelight/quad_tree.h"
+#include "evelight/renderer.h"
+
+using namespace evl;
 
 class DynRect : public FilledRectangle, public QTEntity {
 public:
@@ -22,7 +24,7 @@ private:
 
 class QuadTest : public Game {
 public:
-    QuadTest(const string& title, int width, int height)
+    QuadTest(const std::string& title, int width, int height)
         : Game(title, width, height)
     {
     }
@@ -95,7 +97,7 @@ bool QuadTest::onGameUpdate(uint dt)
         mQuadRects.push_back(rect);
         mRenderer.Add(rect);
         numObjs++;
-        maxDepth = max(maxDepth, qNode->GetDepth());
+        maxDepth = std::max(maxDepth, qNode->GetDepth());
         return true;
     };
     mQTree.Traverse(f);

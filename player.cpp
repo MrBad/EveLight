@@ -1,7 +1,7 @@
 #include "player.h"
 #include "ball.h"
 #include "balls.h"
-#include "game.h"
+#include "evelight/game.h"
 
 Player::Player(float x, float y, float width, float height, uint texId)
     : Entity(x, y, width, height)

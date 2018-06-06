@@ -1,16 +1,16 @@
 #pragma once
 
-#include "entity.h"
-#include "game.h"
-#include "gl_program.h"
-#include "multi_sprite.h"
+#include "evelight/entity.h"
+#include "evelight/game.h"
+#include "evelight/gl_program.h"
+#include "evelight/multi_sprite.h"
+#include "evelight/rectangle.h"
+#include "evelight/renderer.h"
+#include "evelight/sprite.h"
+#include "evelight/texter.h"
+#include "evelight/texture.h"
+#include "evelight/texture_manager.h"
 #include "player.h"
-#include "rectangle.h"
-#include "renderer.h"
-#include "sprite.h"
-#include "texter.h"
-#include "texture.h"
-#include "texture_manager.h"
 #include <GL/glew.h>
 
 enum EntityType {
@@ -22,7 +22,7 @@ enum EntityType {
 
 class Balls : public Game {
 public:
-    Balls(const string& title, int width, int height)
+    Balls(const std::string& title, int width, int height)
         : Game(title, width, height)
     {
     }

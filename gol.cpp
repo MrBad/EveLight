@@ -69,7 +69,9 @@ bool GOL::onGameInit()
         CELL_SIZE,
         Color(128, 160, 128, 80));
 
-    mProgram.Create("res/shaders/simple");
+    if (! mProgram.Create("res/shaders/simple"))
+        exit(-1);
+
     mRenderer.Init();
     mCamera.SetPos(mWindow.GetWidth() / 2, mWindow.GetHeight() / 2);
 

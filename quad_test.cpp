@@ -43,7 +43,9 @@ private:
 
 bool QuadTest::onGameInit()
 {
-    mProgram.Create("res/shaders/simple");
+    if (! mProgram.Create("res/shaders/simple"))
+        exit(-1);
+
     mCamera.SetPos(mWindow.GetWidth() / 2, mWindow.GetHeight() / 2);
     mRenderer.Init();
     mQTree.Init(AABB(0, 0, mWindow.GetWidth(), mWindow.GetHeight()), true);

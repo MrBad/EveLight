@@ -77,7 +77,8 @@ void Balls::buildMap()
 
 bool Balls::onGameInit()
 {
-    mProgram.Create("res/shaders/simple");
+    if (! mProgram.Create("res/shaders/simple"))
+        exit(-1);
 
     mTexMgr.Add("circle", "res/textures/circle.png");
     mTexMgr.Add("brick", "res/textures/brick.png");

@@ -1,4 +1,5 @@
 #define GLM_FORCE_RADIANS
+#define GLM_ENABLE_EXPERIMENTAL
 #include "camera.h"
 #include <GL/glew.h>
 #include <glm/gtx/string_cast.hpp>
